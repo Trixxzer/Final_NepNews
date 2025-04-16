@@ -20,7 +20,7 @@ class RegisterView(APIView):
 
 # For Login
 class LoginView(APIView):
-    defend post(self, request):
+    def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
