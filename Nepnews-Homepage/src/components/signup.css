@@ -1,0 +1,144 @@
+.signup-container {
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.signup-left {
+  width: 50%;
+  background-color: #1f2937;
+  color: white;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.signup-left h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.signup-left p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.signup-right {
+  width: 50%;
+  background-color: #ffffff;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  overflow-y: auto;
+}
+
+.back-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.logo {
+  max-width: 120px;
+  margin-bottom: 20px;
+  margin-top: 30px;
+}
+
+.signup-right h2 {
+  font-size: 24px;
+  margin-bottom: 30px;
+}
+
+.role-select {
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 350px;
+}
+
+.role-select select {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 30px;
+  border: 1px solid #e5e7eb;
+}
+
+.input-box {
+  display: flex;
+  align-items: center;
+  background-color: #e5e7eb;
+  border-radius: 30px;
+  padding: 12px 20px;
+  margin: 10px 0;
+  width: 100%;
+  max-width: 350px;
+}
+
+.input-box .icon {
+  margin-right: 10px;
+  color: #555;
+}
+
+.input-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex: 1;
+  font-size: 16px;
+}
+
+.signup-btn {
+  background-color: #2563eb;
+  color: white;
+  padding: 12px 0;
+  width: 100%;
+  max-width: 350px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 20px;
+}
+
+.signup-btn:hover {
+  background-color: #030710;
+}
+
+.login-link {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.login-link a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.google-signup {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.google-icon-container {
+  margin-top: 8px;
+}
+
+.google-signup .social-icon {
+  font-size: 28px;
+  cursor: pointer;
+}

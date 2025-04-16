@@ -1,0 +1,19 @@
+.footer {
+  background: #C1825E;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+
+.footer .about,
+.footer .contact {
+  flex: 1;
+  min-width: 250px;
+}
+
+.social-icons {
+  display: flex;
+  gap: 10px;
+  size:  2%;
+}

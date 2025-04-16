@@ -1,0 +1,45 @@
+/* styles.css */
+body {
+  font-family: sans-serif;
+  color: #1a202c;
+  margin: 0;
+  padding: 0;
+  background: #f9fafb;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #ccc;
+}
+
+header h1 span:first-child {
+  color: red;
+}
+
+nav a {
+  margin-left: 1rem;
+  text-decoration: none;
+  color: #333;
+}
+
+section {
+  padding: 1.5rem;
+}
+
+.news-card {
+  background: white;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  margin-bottom: 1rem;
+  border-radius: 5px;
+}
+
+footer {
+  background: #111;
+  color: white;
+  padding: 1.5rem;
+  font-size: 14px;
+}
