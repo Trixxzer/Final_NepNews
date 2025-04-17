@@ -57,15 +57,7 @@ class LoginSerializer(serializers.Serializer):
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
-    class Meta:
-        fields = ['email']
-
 class PasswordResetConfirmSerializer(serializers.Serializer):
+    uid = serializers.CharField()
     token = serializers.CharField()
-    password = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
-
-    def validate(self, data):
-        if data['password'] != data['password2']:
-            raise serializers.ValidationError({"password": "Password fields didn't match."})
-        return data
+    new_password = serializers.CharField(min_length=8, write_only=True)
