@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',  # CORS headers for API
     'rest_framework.authtoken',  # Token authentication
     'accounts',  # Custom user accounts app
-    'news',  # Add this line
+    'news',  #  news app
 ]
 
 MIDDLEWARE = [
@@ -60,7 +60,7 @@ MIDDLEWARE = [
 ]
 
 # Frontend URL for password reset
-FRONTEND_URL = 'http://localhost:3000'  # Your React app URL
+FRONTEND_URL = 'http://localhost:3000'  # React app URL
 
 # CORS Settings
 CORS_ALLOWED_ORIGINS = [
@@ -107,7 +107,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'newsportal',
         'USER': 'postgres',    # Changed to postgres superuser
-        'PASSWORD': 'admin123',  # Your postgres superuser password
+        'PASSWORD': 'admin123',  #postgres superuser password
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -157,7 +157,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # or your SMTP server
+EMAIL_HOST = 'smtp.gmail.com'  # SMTP server
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'rajiv00khattri@gmail.com'

@@ -12,5 +12,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('accounts.urls')),
     path('api/', include(router.urls)),
-    path('', RedirectView.as_view(url='/admin/', permanent=False)),
+    path('', RedirectView.as_view(url='/api/auth/login/', permanent=False)),  # Changed from /admin/ to /api/auth/login/
 ]
