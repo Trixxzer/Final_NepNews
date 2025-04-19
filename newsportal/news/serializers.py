@@ -1,16 +1,8 @@
 from rest_framework import serializers
-from .models import Category, Article
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ['id', 'name', 'slug']
+from .models import Article
 
 class ArticleSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source='category.name', read_only=True)
-    author_name = serializers.CharField(source='author.username', read_only=True)
-
     class Meta:
         model = Article
-        fields = ['id', 'title', 'content', 'image', 'category', 'category_name', 
-                 'author', 'author_name', 'created_at', 'is_featured']
+        fields = ['id', 'title', 'content', 'category', 'status', 'created_at', 'updated_at', 'editor_comments']
+        read_only_fields = ['author', 'status', 'editor_comments']

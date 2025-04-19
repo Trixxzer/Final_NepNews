@@ -36,22 +36,24 @@ class UserSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(style={'input_type': 'password'})
 
     def validate(self, data):
         username = data.get('username')
         password = data.get('password')
 
-        # Authenticate the user
-        user = authenticate(username=username, password=password)
-
-        if not user:
-            raise serializers.ValidationError("Invalid username or password.")
-        
-        # Optionally, you can return the user or user data here if needed
-        return {
-            'user': user
-        }
+        if username and password:
+            user = authenticate(username=username, password=password)
+            if user:
+                if user.is_active:
+                    data['user'] = user
+                    return data
+                else:
+                    raise serializers.ValidationError('User account is disabled.')
+            else:
+                raise serializers.ValidationError('Invalid username or password.')
+        else:
+            raise serializers.ValidationError('Must include "username" and "password".')
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):

@@ -14,6 +14,18 @@ from .serializers import UserSerializer, LoginSerializer, PasswordResetRequestSe
 User = get_user_model()
 
 class RegisterView(APIView):
+    def get(self, request):
+        return Response({
+            "message": "Please send a POST request with the following fields to register",
+            "required_fields": {
+                "username": "your username",
+                "email": "your email",
+                "password": "your password",
+                "password2": "confirm password",
+                "role": "select one: editor, author, or reader"
+            }
+        })
+
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -28,6 +40,16 @@ class RegisterView(APIView):
 
 # For Login
 class LoginView(APIView):
+    def get(self, request):
+        # Return a simple response for GET requests
+        return Response({
+            "message": "Please send a POST request with username and password to login",
+            "required_fields": {
+                "username": "your username",
+                "password": "your password"
+            }
+        })
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():

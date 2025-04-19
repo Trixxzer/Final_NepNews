@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import CustomUser
+from django.conf import settings
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -9,14 +9,23 @@ class Category(models.Model):
         return self.name
 
 class Article(models.Model):
+    STATUS_CHOICES = (
+        ('draft', 'Draft'),
+        ('pending', 'Pending Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    )
+
     title = models.CharField(max_length=200)
     content = models.TextField()
-    image = models.URLField(max_length=500)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    description = models.TextField(help_text="A brief description of the article")
+    image = models.ImageField(upload_to='articles/', null=True, blank=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_featured = models.BooleanField(default=False)
+    editor_comments = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title
