@@ -9,6 +9,7 @@ class Category(models.Model):
         return self.name
 
 class Article(models.Model):
+    # Define STATUS_CHOICES at the class level
     STATUS_CHOICES = (
         ('draft', 'Draft'),
         ('pending', 'Pending Review'),

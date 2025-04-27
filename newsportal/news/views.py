@@ -5,6 +5,23 @@ from rest_framework.response import Response
 from .models import Article
 from .serializers import ArticleSerializer
 
+# Add this new ViewSet
+class FeaturedArticlesViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = ArticleSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        try:
+            queryset = Article.objects.filter(status='approved')
+            featured = self.request.query_params.get('featured', None)
+            if featured is not None:
+                # Check if 'featured' field exists in your Article model
+                queryset = queryset.filter(featured=True)
+            return queryset
+        except Exception as e:
+            print(f"Error in get_queryset: {str(e)}")
+            return Article.objects.none()
+
 class AuthorArticleViewSet(viewsets.ModelViewSet):
     serializer_class = ArticleSerializer
     permission_classes = [permissions.IsAuthenticated]

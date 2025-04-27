@@ -20,19 +20,19 @@ const Login = () => {
       const response = await newsApi.login({ username, password });
       localStorage.setItem('token', response.data.token);
       
-      // If Django auth succeeds, then try Firebase auth with email
-      try {
-        // Assuming your backend returns user email in response
-        const userEmail = response.data.email || `${username}@example.com`;
-        await signInWithEmailAndPassword(auth, userEmail, password);
-      } catch (firebaseError) {
-        // Continue even if Firebase auth fails
-        console.log("Firebase auth failed but continuing with Django auth");
+      // Only attempt Firebase auth if we have an email
+      if (response.data.email) {
+        try {
+          await signInWithEmailAndPassword(auth, response.data.email, password);
+        } catch (firebaseError) {
+          console.log("Firebase auth failed:", firebaseError.message);
+          // Don't block login if Firebase fails
+        }
       }
       
       navigate('/');
     } catch (err) {
-      setError('Invalid username or password');
+      setError(err.response?.data?.detail || 'Invalid username or password');
     }
   };
 
@@ -40,9 +40,17 @@ const Login = () => {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      console.log("Logged in with Google:", user);
-      navigate("/");
+      // After Google auth success, authenticate with your backend
+      try {
+        const response = await newsApi.login({
+          username: result.user.email,
+          password: result.user.uid // or some other identifier
+        });
+        localStorage.setItem('token', response.data.token);
+        navigate("/");
+      } catch (backendError) {
+        setError("Backend authentication failed after Google sign-in");
+      }
     } catch (error) {
       setError("Google sign-in failed: " + error.message);
     }
