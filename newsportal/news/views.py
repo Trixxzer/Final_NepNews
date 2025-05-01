@@ -10,6 +10,45 @@ class FeaturedArticlesViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ArticleSerializer
     permission_classes = [permissions.AllowAny]
 
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def add_comment(self, request, pk=None):
+        article = self.get_object()
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user, article=article)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'])
+    def comments(self, request, pk=None):
+        article = self.get_object()
+        comments = Comment.objects.filter(article=article)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def interact(self, request, pk=None):
+        article = self.get_object()
+        interaction, created = ArticleInteraction.objects.get_or_create(
+            article=article,
+            user=request.user,
+            defaults={'liked': False, 'disliked': False}
+        )
+
+        action = request.data.get('action')
+        if action == 'like':
+            interaction.liked = not interaction.liked
+            interaction.disliked = False
+        elif action == 'dislike':
+            interaction.disliked = not interaction.disliked
+            interaction.liked = False
+
+        interaction.save()
+        return Response({
+            'liked': interaction.liked,
+            'disliked': interaction.disliked
+        })
+
     def get_queryset(self):
         try:
             queryset = Article.objects.filter(status='approved')
