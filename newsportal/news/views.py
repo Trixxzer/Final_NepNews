@@ -92,3 +92,44 @@ def author_api_overview(request):
         }
     }
     return Response(api_urls)
+
+
+class EditorPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role == 'editor'
+
+class EditorArticleViewSet(viewsets.ModelViewSet):
+    serializer_class = ArticleSerializer
+    permission_classes = [EditorPermission]
+
+    def get_queryset(self):
+        # Editors can see all articles
+        return Article.objects.all()
+
+    @action(detail=True, methods=['post'])
+    def review_article(self, request, pk=None):
+        article = self.get_object()
+        if article.status != 'pending':
+            return Response(
+                {'error': 'Only pending articles can be reviewed'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Get review decision and comments from request
+        decision = request.data.get('decision')
+        comments = request.data.get('editor_comments')
+
+        if decision not in ['approved', 'rejected']:
+            return Response(
+                {'error': 'Invalid decision'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        article.status = decision
+        article.editor_comments = comments
+        article.save()
+
+        return Response({
+            'status': article.status,
+            'editor_comments': article.editor_comments
+        })
