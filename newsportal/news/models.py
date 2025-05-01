@@ -12,24 +12,26 @@ class Category(models.Model):
         return self.name
 
 class Article(models.Model):
-    # Define STATUS_CHOICES at the class level
-    STATUS_CHOICES = (
+    STATUS_CHOICES = [
         ('draft', 'Draft'),
         ('pending', 'Pending Review'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected')
-    )
+    ]
 
     title = models.CharField(max_length=200)
     content = models.TextField()
-    description = models.TextField(help_text="A brief description of the article")
+    description = models.TextField()
     image = models.ImageField(upload_to='articles/', null=True, blank=True)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    editor_comments = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    editor_comments = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        ordering = ['-created_at']
