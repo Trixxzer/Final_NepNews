@@ -8,6 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('accounts.urls')),
     path('api/', include('news.urls')),
+    path('api/admin/', include('admin_panel.urls')),  # Add this line
     path('', RedirectView.as_view(url='/api/auth/login/', permanent=False)),
 ]
 

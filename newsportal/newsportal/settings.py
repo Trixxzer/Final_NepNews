@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',  # Token authentication
     'accounts',  # Custom user accounts app
     'news',  #  news app
+    'admin_panel',  # Admin panel app
 ]
 
 MIDDLEWARE = [
