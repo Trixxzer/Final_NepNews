@@ -50,10 +50,13 @@ INSTALLED_APPS = [
     'rest_framework',  # Django REST framework
     'corsheaders',  # CORS headers for API
     'rest_framework.authtoken',  # Token authentication
+
     'accounts',  # Custom user accounts app
-    'news',  #  news app
+    'news',  # news app
     'admin_panel',  # Admin panel app
+    'api',  
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -63,7 +66,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # CORS middleware
+    'corsheaders.middleware.CorsMiddleware',
+    'allauth.account.middleware.AccountMiddleware' 
+
 ]
 
 # Frontend URL for password reset
