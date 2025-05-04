@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'accounts',  # Custom user accounts app
     'news',  #  news app
     'admin_panel',  # Admin panel app
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
 ]
 
 MIDDLEWARE = [
@@ -174,3 +176,14 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'rajiv00khattri@gmail.com'
 EMAIL_HOST_PASSWORD = 'fonx epyb venj teqm'
 DEFAULT_FROM_EMAIL = 'rajiv00khattri@gmail.com'
+
+SITE_ID = 1
+
+REST_USE_JWT = False
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+LOGIN_REDIRECT_URL = '/'
