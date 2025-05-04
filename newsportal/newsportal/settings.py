@@ -41,6 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # For allauth
+    'allauth',  # Django allauth for authentication
+    'allauth.account',  # Django allauth for account management
+    'allauth.socialaccount',  # Django allauth for social accounts
+    'allauth.socialaccount.providers.google',  # Google provider for allauth
 
     'rest_framework',  # Django REST framework
     'corsheaders',  # CORS headers for API
