@@ -66,9 +66,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+<<<<<<< HEAD
     'corsheaders.middleware.CorsMiddleware',
     'allauth.account.middleware.AccountMiddleware' 
 
+=======
+    'corsheaders.middleware.CorsMiddleware',  # CORS middleware
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # allauth middleware
+    'allauth.account.middleware.AccountMiddleware',
+>>>>>>> 9726f85054785e36efaf0be37f697347b257904e
 ]
 
 # Frontend URL for password reset
