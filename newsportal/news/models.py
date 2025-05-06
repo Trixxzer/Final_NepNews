@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -11,6 +13,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class Article(models.Model):
     STATUS_CHOICES = [
         ('draft', 'Draft'),
@@ -19,7 +22,7 @@ class Article(models.Model):
         ('rejected', 'Rejected')
     ]
 
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=300)  # Increased from 200 to 300
     content = models.TextField()
     description = models.TextField()
     image = models.ImageField(upload_to='articles/', null=True, blank=True)
@@ -47,6 +50,7 @@ class Comment(models.Model):
     def __str__(self):
         return f'Comment by {self.user.username} on {self.article.title}'
 
+
 class ArticleInteraction(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='interactions')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -59,3 +63,14 @@ class ArticleInteraction(models.Model):
 
     def __str__(self):
         return f'Interaction by {self.user.username} on {self.article.title}'
+
+
+class News(models.Model):
+    title = models.CharField(max_length=1000)  # updated
+    link = models.URLField(max_length=1000, blank=True, null=True)  # updated
+    pub_date = models.DateTimeField(default=timezone.now)
+    source = models.CharField(max_length=300, blank=True, null=True)  # updated
+    content = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.title
