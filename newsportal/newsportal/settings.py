@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-n%zj6e(#uc_d_^6yg2n(w61g!7vljr0#f2&n#1&aqrc^^1k(u)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["*"]  # Allow all hosts for development
+ALLOWED_HOSTS = ['https://collabbackend-z0kd.onrender.com', 'collabbackend-z0kd.onrender.com']  
 
 # Authentication
 AUTH_USER_MODEL = 'accounts.CustomUser'
