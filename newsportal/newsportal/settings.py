@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import os  # Add this import at the top
+import os  # Addimport at the top
+import dj_database_url
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,10 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-n%zj6e(#uc_d_^6yg2n(w61g!7vljr0#f2&n#1&aqrc^^1k(u)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]  # Allow all hosts for development
-
 
 # Authentication
 AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -68,16 +69,20 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # CORS middleware
     'django.contrib.auth.middleware.AuthenticationMiddleware',  # allauth middleware
     'allauth.account.middleware.AccountMiddleware',
+
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise middleware for static files
+    ''
+
 ]
 
-# Frontend URL for password reset
-FRONTEND_URL = 'http://localhost:3000'  # React app URL
+# # Frontend URL for password reset
+# FRONTEND_URL = 'http://localhost:3000'  # React app URL
 
 # CORS Settings
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vite's default port
-    "http://127.0.0.1:5173",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",  # Vite's default port
+#     "http://127.0.0.1:5173",
+# ]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -114,14 +119,7 @@ WSGI_APPLICATION = 'newsportal.wsgi.application'
 
 # Database (PostgreSQL)
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'newsportal',
-        'USER': 'postgres',    # Changed to postgres superuser
-        'PASSWORD': 'admin123',  #postgres superuser password
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.parse(config('DATABASE_URL'))
 }
 
 
@@ -156,10 +154,12 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
