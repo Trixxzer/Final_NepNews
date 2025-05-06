@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'admin_panel',  # Admin panel app
     'dj_rest_auth',
     'dj_rest_auth.registration',
+    'newsportal',  # Main app
 ]
 
 MIDDLEWARE = [
@@ -70,8 +71,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',  # allauth middleware
     'allauth.account.middleware.AccountMiddleware',
 
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise middleware for static files
-    ''
+    'whitenoise.middleware.WhiteNoiseMiddleware'  # WhiteNoise middleware for static files
 
 ]
 
