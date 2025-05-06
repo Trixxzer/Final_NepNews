@@ -2,8 +2,8 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Article
-from .serializers import ArticleSerializer
+from .models import Article, Comment, ArticleInteraction  # Add ArticleInteraction here
+from .serializers import ArticleSerializer, CommentSerializer, ArticleInteractionSerializer  # Add these serializers
 
 # Add this new ViewSet
 class FeaturedArticlesViewSet(viewsets.ReadOnlyModelViewSet):
