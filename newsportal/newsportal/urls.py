@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/auth/', include('accounts.urls')),
     path('api/', include('news.urls')),
     path('api/admin/', include('admin_panel.urls')),  
+    path('api/fetchednews/', include('fetchednews.urls')),
     path('', RedirectView.as_view(url='/api/auth/login/', permanent=False)),
 
     # DRF token authentication

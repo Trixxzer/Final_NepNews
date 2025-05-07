@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'newsportal',  # Main app
+    'fetchednews',  # Add this line
 ]
 
 MIDDLEWARE = [
@@ -80,12 +81,14 @@ MIDDLEWARE = [
 # FRONTEND_URL = 'http://localhost:3000'  # React app URL
 
 # CORS Settings
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:5173",  # Vite's default port
-#     "http://127.0.0.1:5173",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5174",  # Your frontend's local dev server
+    # Add your deployed frontend URL here if needed
+]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# CORS_ALLOW_ALL_ORIGINS = True  # Remove or comment this out for security
 
 # REST Framework
 REST_FRAMEWORK = {
