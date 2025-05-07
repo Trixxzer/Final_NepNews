@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime
+from django.utils import timezone
 from .models import FetchedNews
 
 class NewsDataIOService:
@@ -10,29 +11,32 @@ class NewsDataIOService:
     def fetch_nepal_news(cls):
         params = {
             'apikey': cls.API_KEY,
-            'country': 'np',  # Nepal country code
-            'language': 'en',  # English language
-            'size': 100  # Maximum number of results
+            'country': 'np',  # Only Nepal (API param, but we filter in code)
+            'language': 'en',  # English news
         }
-
         try:
             response = requests.get(cls.BASE_URL, params=params)
             response.raise_for_status()
             news_data = response.json()
-
             if news_data.get('status') == 'success':
-                articles = news_data.get('results', [])
-                saved_count = 0
+                for article in news_data.get('results', []):
+                    country_list = article.get('country', [])
+                    title = article.get('title', '').lower()
+                    description = (article.get('description') or '').lower()
+                    content = (article.get('content') or '').lower()
 
-                for article in articles:
-                    try:
-                        # Convert the date string to datetime object
-                        published_at = datetime.strptime(
-                            article.get('pubDate'), 
-                            '%Y-%m-%d %H:%M:%S'
-                        )
-
-                        # Create or update the news article
+                    # Only save if country is exactly ['nepal'] or 'nepal' in text
+                    if (
+                        (isinstance(country_list, list) and len(country_list) == 1 and country_list[0].lower() == 'nepal')
+                        or
+                        ('nepal' in title or 'nepal' in description or 'nepal' in content)
+                    ):
+                        pub_date = article.get('pubDate')
+                        if pub_date:
+                            published_at = datetime.strptime(pub_date, '%Y-%m-%d %H:%M:%S')
+                            published_at = timezone.make_aware(published_at, timezone=timezone.utc)
+                        else:
+                            published_at = timezone.now()
                         FetchedNews.objects.update_or_create(
                             source_id=article.get('article_id'),
                             defaults={
@@ -45,14 +49,8 @@ class NewsDataIOService:
                                 'category': article.get('category')[0] if article.get('category') else None,
                             }
                         )
-                        saved_count += 1
-                    except Exception as e:
-                        print(f"Error processing article {article.get('article_id')}: {str(e)}")
-                        continue
-
-                return True, f'Successfully fetched and saved {saved_count} news articles'
-            return False, 'Failed to fetch news from API'
-
+                return True, 'Successfully fetched Nepal news only.'
+            return False, 'Failed to fetch news.'
         except requests.exceptions.RequestException as e:
             return False, f'Error connecting to newsdata.io: {str(e)}'
         except Exception as e:

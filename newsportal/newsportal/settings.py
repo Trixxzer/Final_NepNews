@@ -27,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-n%zj6e(#uc_d_^6yg2n(w61g!7vljr0#f2&n#1&aqrc^^1k(u)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['https://collabbackend-z0kd.onrender.com', 'collabbackend-z0kd.onrender.com']  
+ALLOWED_HOSTS = ['https://collabbackend-z0kd.onrender.com', 'collabbackend-z0kd.onrender.com', '*']  
 
 # Authentication
 AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'newsportal',  # Main app
     'fetchednews',  # Add this line
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -191,3 +192,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 LOGIN_REDIRECT_URL = '/'
+
+CRONJOBS = [
+    ('0 * * * *', 'fetchednews.services.NewsDataIOService.fetch_nepal_news'),  # every hour
+]
