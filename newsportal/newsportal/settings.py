@@ -82,14 +82,13 @@ MIDDLEWARE = [
 # FRONTEND_URL = 'http://localhost:3000'  # React app URL
 
 # CORS Settings
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5174",  # Your frontend's local dev server
-    # Add your deployed frontend URL here if needed
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5174",  # Your frontend's local dev server
+#     # Add your deployed frontend URL here if needed
+# ]
 
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-
-# CORS_ALLOW_ALL_ORIGINS = True  # Remove or comment this out for security
 
 # REST Framework
 REST_FRAMEWORK = {
