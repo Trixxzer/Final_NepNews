@@ -2,9 +2,11 @@ import requests
 from datetime import datetime
 from django.utils import timezone
 from .models import FetchedNews
+import hashlib
+from datetime import timezone as dt_timezone
 
 class NewsDataIOService:
-    API_KEY = 'pub_7510089beba8b13adc5f89f71f7c4aa07ca39'
+    API_KEY = 'pub_750981d4fb4ba5fd1df22740a52b0d4c6ef49'
     BASE_URL = 'https://newsdata.io/api/1/news'
 
     @classmethod
@@ -25,20 +27,29 @@ class NewsDataIOService:
                     description = (article.get('description') or '').lower()
                     content = (article.get('content') or '').lower()
 
-                    # Only save if country is exactly ['nepal'] or 'nepal' in text
+                    # Save only if country is exactly ['nepal'], or if country is missing/empty and 'nepal' in text
                     if (
                         (isinstance(country_list, list) and len(country_list) == 1 and country_list[0].lower() == 'nepal')
                         or
-                        ('nepal' in title or 'nepal' in description or 'nepal' in content)
+                        (not country_list and ('nepal' in title or 'nepal' in description or 'nepal' in content))
                     ):
                         pub_date = article.get('pubDate')
                         if pub_date:
                             published_at = datetime.strptime(pub_date, '%Y-%m-%d %H:%M:%S')
-                            published_at = timezone.make_aware(published_at, timezone=timezone.utc)
+                            published_at = timezone.make_aware(published_at, timezone=dt_timezone.utc)
                         else:
                             published_at = timezone.now()
+                        # Ensure a unique source_id: use article_id if present, else hash of link+pub_date
+                        raw_article_id = article.get('article_id')
+                        if raw_article_id:
+                            source_id = raw_article_id
+                        else:
+                            # Fallback: use link+pub_date as unique identifier
+                            unique_str = (article.get('link', '') or '') + (article.get('pubDate', '') or '')
+                            source_id = hashlib.sha256(unique_str.encode('utf-8')).hexdigest()
+                        print("Processing:", article.get('title'), source_id)
                         FetchedNews.objects.update_or_create(
-                            source_id=article.get('article_id'),
+                            source_id=source_id,
                             defaults={
                                 'title': article.get('title'),
                                 'description': article.get('description'),
