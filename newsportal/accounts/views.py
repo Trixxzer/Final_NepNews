@@ -15,6 +15,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
 from .models import AuthorProfile, EditorProfile, CustomUser
 from rest_framework.reverse import reverse
+from dj_rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 
 User = get_user_model()
 
@@ -185,3 +187,21 @@ class AccountsApiRootView(APIView):
             'test-connection': reverse('test-connection', request=request),
             'social': reverse('google_login', request=request),
         })
+
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        # If signup, set role to 'user'
+        if response.status_code == 201:
+            user = CustomUser.objects.get(email=response.data['user']['email'])
+            if user.role != 'user':
+                user.role = 'user'
+                user.save()
+        # If login, only allow if role is 'user'
+        if response.status_code == 200:
+            user = CustomUser.objects.get(email=response.data['user']['email'])
+            if user.role != 'user':
+                return Response({'error': 'Google login is only allowed for users with role "user".'}, status=status.HTTP_403_FORBIDDEN)
+        return response
