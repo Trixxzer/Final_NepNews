@@ -4,6 +4,7 @@ from rest_framework.authtoken.models import Token
 from .models import EmailVerificationToken, UserProfile, AuthorProfile, EditorProfile, AdminProfile
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.db import transaction
 
 User = get_user_model()
 
@@ -56,37 +57,48 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        password2 = validated_data.pop('password2')
-        role = validated_data.get('role')
-        # Extract profile fields
-        profile_picture = validated_data.pop('profile_picture', None)
-        bio = validated_data.pop('bio', None)
-        category_expertise = validated_data.pop('category_expertise', None)
-        certificates = validated_data.pop('certificates', None)
-        areas_of_oversight = validated_data.pop('areas_of_oversight', None)
-        management_responsibilities = validated_data.pop('management_responsibilities', None)
-        approval_document = validated_data.pop('approval_document', None)
-        
-        user = User(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            role=role
-        )
-        user.set_password(validated_data['password'])
-        # Set is_active=False for author/editor until approved
-        if role in ['author', 'editor']:
-            user.is_active = False
-        user.save()
-        # Create profile based on role
-        if role == 'user':
-            UserProfile.objects.create(user=user, profile_picture=profile_picture)
-        elif role == 'author':
-            AuthorProfile.objects.create(user=user, bio=bio, category_expertise=category_expertise, certificates=certificates, approval_status='pending')
-        elif role == 'editor':
-            EditorProfile.objects.create(user=user, areas_of_oversight=areas_of_oversight, management_responsibilities=management_responsibilities or [], approval_status='pending')
-        elif role == 'admin':
-            AdminProfile.objects.create(user=user, approval_document=approval_document)
-        return user
+        with transaction.atomic():
+            password2 = validated_data.pop('password2')
+            role = validated_data.get('role')
+            # Extract profile fields
+            profile_picture = validated_data.pop('profile_picture', None)
+            bio = validated_data.pop('bio', None)
+            category_expertise = validated_data.pop('category_expertise', None)
+            certificates = validated_data.pop('certificates', None)
+            areas_of_oversight = validated_data.pop('areas_of_oversight', None)
+            management_responsibilities = validated_data.pop('management_responsibilities', None)
+            approval_document = validated_data.pop('approval_document', None)
+
+            user = User(
+                username=validated_data['username'],
+                email=validated_data['email'],
+                role=role
+            )
+            user.set_password(validated_data['password'])
+            if role in ['author', 'editor']:
+                user.is_active = False
+            user.save()
+            # Create profile based on role
+            if role == 'user':
+                UserProfile.objects.create(user=user, profile_picture=profile_picture)
+            elif role == 'author':
+                AuthorProfile.objects.create(
+                    user=user,
+                    bio=bio,
+                    category_expertise=category_expertise,
+                    certificates=certificates,
+                    approval_status='pending'
+                )
+            elif role == 'editor':
+                EditorProfile.objects.create(
+                    user=user,
+                    areas_of_oversight=areas_of_oversight,
+                    management_responsibilities=management_responsibilities or [],
+                    approval_status='pending'
+                )
+            elif role == 'admin':
+                AdminProfile.objects.create(user=user, approval_document=approval_document)
+            return user
 
 
 class LoginSerializer(serializers.Serializer):
