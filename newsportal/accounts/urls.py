@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import RegisterView, LoginView, PasswordResetView, PasswordResetConfirmView, TestConnectionView, AccountsApiRootView
+from .views import RegisterView, LoginView, PasswordResetView, PasswordResetConfirmView, TestConnectionView, AccountsApiRootView, LogoutView
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 
@@ -10,6 +10,7 @@ urlpatterns = [
     path('', AccountsApiRootView.as_view(), name='accounts-api-root'),
     path('register/', RegisterView.as_view(), name='register'),
     path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
     path('password-reset/', PasswordResetView.as_view(), name='password-reset'),
     path('password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
     path('test-connection/', TestConnectionView.as_view(), name='test-connection'),

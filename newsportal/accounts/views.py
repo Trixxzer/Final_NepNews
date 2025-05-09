@@ -182,6 +182,7 @@ class AccountsApiRootView(APIView):
         return Response({
             'register': reverse('register', request=request),
             'login': reverse('login', request=request),
+            'logout': reverse('logout', request=request),
             'password-reset': reverse('password-reset', request=request),
             'password-reset-confirm': reverse('password-reset-confirm', request=request),
             'test-connection': reverse('test-connection', request=request),
@@ -205,3 +206,18 @@ class GoogleLogin(SocialLoginView):
             if user.role != 'user':
                 return Response({'error': 'Google login is only allowed for users with role "user".'}, status=status.HTTP_403_FORBIDDEN)
         return response
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            # Delete the auth token
+            request.user.auth_token.delete()
+            return Response({
+                'message': 'Successfully logged out.'
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({
+                'error': 'Error during logout.'
+            }, status=status.HTTP_400_BAD_REQUEST)
