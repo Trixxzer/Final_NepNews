@@ -27,9 +27,19 @@ class UserProfile(models.Model):
 
 # Profile for Author
 class AuthorProfile(models.Model):
+    EXPERTISE_CHOICES = [
+        ('News', 'News'),
+        ('Politics', 'Politics'),
+        ('Sports', 'Sports'),
+        ('Entertainment', 'Entertainment'),
+        ('Technology', 'Technology'),
+        ('Health', 'Health'),
+        ('Science', 'Science'),
+        ('Business', 'Business'),
+    ]
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='author_profile')
     bio = models.TextField(blank=True)
-    category_expertise = models.CharField(max_length=100, blank=True)
+    category_expertise = models.CharField(max_length=50, choices=EXPERTISE_CHOICES)
     certificates = models.FileField(upload_to='author_certificates/', blank=True, null=True)
     approval_status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='pending')
     approval_comment = models.TextField(blank=True, null=True)

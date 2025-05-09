@@ -1,7 +1,7 @@
 from django.urls import path, include
 from .views import (
     RegisterView, LoginView, PasswordResetView, PasswordResetConfirmView, TestConnectionView, AccountsApiRootView, LogoutView,
-    EditorDashboardView, EditorPublishedArticlesView, EditorPendingReviewsView, EditorArticleDetailView, EditorEditArticleView, EditorApproveArticleView, EditorRequestRevisionView, EditorUnpublishArticleView, GoogleLogin
+    EditorDashboardView, EditorPublishedArticlesView, EditorPendingReviewsView, EditorArticleDetailView, EditorEditArticleView, EditorApproveArticleView, EditorRequestRevisionView, EditorUnpublishArticleView, GoogleLogin, AuthorExpertiseChoicesView
 )
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -17,6 +17,7 @@ urlpatterns = [
     path('password-reset/', PasswordResetView.as_view(), name='password-reset'),
     path('password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
     path('test-connection/', TestConnectionView.as_view(), name='test-connection'),
+    path('author/expertise-choices/', AuthorExpertiseChoicesView.as_view(), name='author-expertise-choices'),
     path('editor/dashboard/', EditorDashboardView.as_view(), name='editor-dashboard'),
     path('editor/published-articles/', EditorPublishedArticlesView.as_view(), name='editor-published-articles'),
     path('editor/pending-reviews/', EditorPendingReviewsView.as_view(), name='editor-pending-reviews'),

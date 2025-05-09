@@ -313,3 +313,12 @@ class EditorUnpublishArticleView(APIView):
         article.status = 'draft'
         article.save()
         return Response({'status': 'draft'})
+
+class AuthorExpertiseChoicesView(APIView):
+    def get(self, request):
+        from .models import AuthorProfile
+        return Response({
+            'expertise_choices': [
+                {'value': choice[0], 'label': choice[1]} for choice in AuthorProfile.EXPERTISE_CHOICES
+            ]
+        })

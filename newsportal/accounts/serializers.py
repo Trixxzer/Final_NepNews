@@ -14,6 +14,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['profile_picture']
 
 class AuthorProfileSerializer(serializers.ModelSerializer):
+    category_expertise = serializers.ChoiceField(choices=AuthorProfile.EXPERTISE_CHOICES)
     class Meta:
         model = AuthorProfile
         fields = ['bio', 'category_expertise', 'certificates', 'approval_status', 'approval_comment', 'approved_by']
