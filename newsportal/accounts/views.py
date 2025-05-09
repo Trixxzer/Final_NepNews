@@ -34,7 +34,8 @@ class RegisterView(APIView):
             return Response({
                 'token': token.key,
                 'user_id': user.id,
-                'username': user.username
+                'username': user.username,
+                'role': user.role
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -58,8 +59,10 @@ class LoginView(APIView):
             return Response({
                 'token': token.key,
                 'user_id': user.id,
-                'username': user.username
-            })
+                'username': user.username,
+                'role': user.role
+            }, status=status.HTTP_200_OK)
+            
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # For Password Reset
