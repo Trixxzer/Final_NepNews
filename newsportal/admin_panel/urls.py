@@ -4,8 +4,15 @@ from .views import (
     DashboardView,
     AdminArticleViewSet,
     AdminUserViewSet,
-    AdminLogViewSet
+    AdminLogViewSet,
+    ApprovalRequestAuthorsView,
+    ApprovalRequestEditorsView,
+    ApproveAuthorView,
+    ApproveEditorView,
+    AdminPanelApiRootView
 )
+
+app_name = 'admin_panel'
 
 router = DefaultRouter()
 router.register(r'articles', AdminArticleViewSet)
@@ -13,6 +20,11 @@ router.register(r'users', AdminUserViewSet)
 router.register(r'logs', AdminLogViewSet)
 
 urlpatterns = [
+    path('', AdminPanelApiRootView.as_view(), name='admin_panel-api-root'),
     path('', include(router.urls)),
     path('dashboard/', DashboardView.as_view(), name='admin-dashboard'),
+    path('approval-requests/authors/', ApprovalRequestAuthorsView.as_view(), name='approval-requests-authors'),
+    path('approval-requests/editors/', ApprovalRequestEditorsView.as_view(), name='approval-requests-editors'),
+    path('approve-author/', ApproveAuthorView.as_view(), name='approve-author'),
+    path('approve-editor/', ApproveEditorView.as_view(), name='approve-editor'),
 ]

@@ -9,7 +9,12 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer, LoginSerializer, PasswordResetRequestSerializer, PasswordResetConfirmSerializer
+from .serializers import UserSerializer, LoginSerializer, PasswordResetRequestSerializer, PasswordResetConfirmSerializer, AuthorProfileSerializer, EditorProfileSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import permissions
+from .models import AuthorProfile, EditorProfile, CustomUser
+from rest_framework.reverse import reverse
 
 User = get_user_model()
 
@@ -22,7 +27,7 @@ class RegisterView(APIView):
                 "email": "your email",
                 "password": "your password",
                 "password2": "confirm password",
-                "role": "select one: editor, author, or reader"
+                "role": "select one: user, author, editor, or admin"
             }
         })
 
@@ -120,3 +125,63 @@ class PasswordResetConfirmView(APIView):
 class TestConnectionView(APIView):
     def get(self, request):
         return Response({"message": "Backend is connected!"}, status=status.HTTP_200_OK)
+
+class IsAdminRole(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role == 'admin'
+
+class ApprovalRequestListView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]
+    def get(self, request):
+        author_pending = AuthorProfile.objects.filter(approval_status='pending')
+        editor_pending = EditorProfile.objects.filter(approval_status='pending')
+        authors = AuthorProfileSerializer(author_pending, many=True).data
+        editors = EditorProfileSerializer(editor_pending, many=True).data
+        return Response({
+            'pending_authors': authors,
+            'pending_editors': editors
+        })
+
+class ApproveRequestView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]
+    def post(self, request):
+        user_id = request.data.get('user_id')
+        role = request.data.get('role')
+        action = request.data.get('action')  # 'approve' or 'reject'
+        comment = request.data.get('comment', '')
+        try:
+            user = CustomUser.objects.get(id=user_id, role=role)
+            if role == 'author':
+                profile = AuthorProfile.objects.get(user=user)
+            elif role == 'editor':
+                profile = EditorProfile.objects.get(user=user)
+            else:
+                return Response({'error': 'Invalid role'}, status=400)
+            if action == 'approve':
+                profile.approval_status = 'approved'
+                user.is_active = True
+            elif action == 'reject':
+                profile.approval_status = 'rejected'
+                user.is_active = False
+            else:
+                return Response({'error': 'Invalid action'}, status=400)
+            profile.approval_comment = comment
+            profile.approved_by = request.user
+            profile.save()
+            user.save()
+            return Response({'success': f'{role.capitalize()} request {action}d.'})
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+        except (AuthorProfile.DoesNotExist, EditorProfile.DoesNotExist):
+            return Response({'error': 'Profile not found'}, status=404)
+
+class AccountsApiRootView(APIView):
+    def get(self, request, format=None):
+        return Response({
+            'register': reverse('register', request=request),
+            'login': reverse('login', request=request),
+            'password-reset': reverse('password-reset', request=request),
+            'password-reset-confirm': reverse('password-reset-confirm', request=request),
+            'test-connection': reverse('test-connection', request=request),
+            'social': reverse('google_login', request=request),
+        })
