@@ -17,6 +17,8 @@ from .models import AuthorProfile, EditorProfile, CustomUser
 from rest_framework.reverse import reverse
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from news.models import Article, Category
+from news.serializers import ArticleSerializer
 
 User = get_user_model()
 
@@ -221,3 +223,93 @@ class LogoutView(APIView):
             return Response({
                 'error': 'Error during logout.'
             }, status=status.HTTP_400_BAD_REQUEST)
+
+class EditorPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and getattr(request.user, 'role', None) == 'editor'
+
+class EditorDashboardView(APIView):
+    permission_classes = [IsAuthenticated, EditorPermission]
+    def get(self, request):
+        total_articles = Article.objects.count()
+        published_articles = Article.objects.filter(status='approved').count()
+        pending_reviews = Article.objects.filter(status='pending').count()
+        recent_articles = Article.objects.order_by('-created_at')[:7]
+        recent_data = ArticleSerializer(recent_articles, many=True).data
+        return Response({
+            'total_articles': total_articles,
+            'published_articles': published_articles,
+            'pending_reviews': pending_reviews,
+            'recent_articles': recent_data
+        })
+
+class EditorPublishedArticlesView(APIView):
+    permission_classes = [IsAuthenticated, EditorPermission]
+    def get(self, request):
+        articles = Article.objects.filter(status='approved')
+        data = ArticleSerializer(articles, many=True).data
+        return Response(data)
+
+class EditorPendingReviewsView(APIView):
+    permission_classes = [IsAuthenticated, EditorPermission]
+    def get(self, request):
+        articles = Article.objects.filter(status='pending')
+        data = ArticleSerializer(articles, many=True).data
+        return Response(data)
+
+class EditorArticleDetailView(APIView):
+    permission_classes = [IsAuthenticated, EditorPermission]
+    def get(self, request, pk):
+        try:
+            article = Article.objects.get(pk=pk)
+        except Article.DoesNotExist:
+            return Response({'error': 'Article not found'}, status=404)
+        data = ArticleSerializer(article).data
+        return Response(data)
+
+class EditorEditArticleView(APIView):
+    permission_classes = [IsAuthenticated, EditorPermission]
+    def put(self, request, pk):
+        try:
+            article = Article.objects.get(pk=pk)
+        except Article.DoesNotExist:
+            return Response({'error': 'Article not found'}, status=404)
+        serializer = ArticleSerializer(article, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+class EditorApproveArticleView(APIView):
+    permission_classes = [IsAuthenticated, EditorPermission]
+    def post(self, request, pk):
+        try:
+            article = Article.objects.get(pk=pk)
+        except Article.DoesNotExist:
+            return Response({'error': 'Article not found'}, status=404)
+        article.status = 'approved'
+        article.save()
+        return Response({'status': 'approved'})
+
+class EditorRequestRevisionView(APIView):
+    permission_classes = [IsAuthenticated, EditorPermission]
+    def post(self, request, pk):
+        try:
+            article = Article.objects.get(pk=pk)
+        except Article.DoesNotExist:
+            return Response({'error': 'Article not found'}, status=404)
+        article.status = 'rejected'
+        article.editor_comments = request.data.get('editor_comments', '')
+        article.save()
+        return Response({'status': 'rejected', 'editor_comments': article.editor_comments})
+
+class EditorUnpublishArticleView(APIView):
+    permission_classes = [IsAuthenticated, EditorPermission]
+    def post(self, request, pk):
+        try:
+            article = Article.objects.get(pk=pk)
+        except Article.DoesNotExist:
+            return Response({'error': 'Article not found'}, status=404)
+        article.status = 'draft'
+        article.save()
+        return Response({'status': 'draft'})
