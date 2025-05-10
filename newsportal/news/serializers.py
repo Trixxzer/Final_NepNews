@@ -23,8 +23,11 @@ class ArticleInteractionSerializer(serializers.ModelSerializer):
 class EditorDashboardArticleSerializer(serializers.ModelSerializer):
     author = serializers.CharField(source='author.username', read_only=True)
     category = serializers.CharField(source='category.name', read_only=True)
-    date = serializers.DateField(source='created_at', format="%b %d, %Y", read_only=True)
+    date = serializers.SerializerMethodField()
 
     class Meta:
         model = Article
         fields = ['id', 'title', 'author', 'category', 'date']
+
+    def get_date(self, obj):
+        return obj.created_at.strftime("%b %d, %Y")
