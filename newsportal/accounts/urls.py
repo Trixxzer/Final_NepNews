@@ -1,7 +1,7 @@
 from django.urls import path, include
 from .views import (
     RegisterView, LoginView, PasswordResetView, PasswordResetConfirmView, TestConnectionView, AccountsApiRootView, LogoutView,
-    EditorDashboardView, EditorPublishedArticlesView, EditorPendingReviewsView, EditorArticleDetailView, EditorEditArticleView, EditorApproveArticleView, EditorRequestRevisionView, EditorUnpublishArticleView, GoogleLogin, AuthorExpertiseChoicesView, AuthorDraftsSummaryView, AuthorReviewsSummaryView, AuthorUpdatesSummaryView, AuthorDraftsListView, AuthorPendingReviewsListView, AuthorUpdatesListView
+    EditorDashboardView, EditorPublishedArticlesView, EditorPendingReviewsView, EditorArticleDetailView, EditorEditArticleView, EditorApproveArticleView, EditorRequestRevisionView, EditorUnpublishArticleView, GoogleLogin, AuthorExpertiseChoicesView, AuthorDraftsSummaryView, AuthorReviewsSummaryView, AuthorUpdatesSummaryView, AuthorDraftsListView, AuthorPendingReviewsListView, AuthorUpdatesListView, AuthorArticleCreateView, AuthorArticleUpdateView, AuthorSubmitForReviewView
 )
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -34,4 +34,7 @@ urlpatterns = [
     path('author/drafts/', AuthorDraftsListView.as_view(), name='author-drafts-list'),
     path('author/pending-reviews/', AuthorPendingReviewsListView.as_view(), name='author-pending-reviews-list'),
     path('author/updates/', AuthorUpdatesListView.as_view(), name='author-updates-list'),
+    path('author/articles/', AuthorArticleCreateView.as_view(), name='author-article-create'),
+    path('author/articles/<int:pk>/', AuthorArticleUpdateView.as_view(), name='author-article-update'),
+    path('author/articles/<int:pk>/submit-for-review/', AuthorSubmitForReviewView.as_view(), name='author-article-submit-for-review'),
 ]
