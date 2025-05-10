@@ -79,3 +79,47 @@ class EditorPendingReviewArticleSerializer(serializers.ModelSerializer):
     
     def get_excerpt(self, obj):
         return obj.content[:100] + '...' if len(obj.content) > 100 else obj.content
+
+class AuthorDraftArticleSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='category.name', read_only=True)
+    date = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Article
+        fields = ['id', 'title', 'category', 'date', 'status']
+
+    def get_date(self, obj):
+        return obj.created_at.strftime("%b %d, %Y")
+    
+    def get_status(self, obj):
+        return 'draft' if obj.status == 'draft' else obj.status
+
+class AuthorUpdatesArticleSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='category.name', read_only=True)
+    date = serializers.SerializerMethodField()
+    views = serializers.SerializerMethodField()
+    excerpt = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    editor_comments = serializers.CharField(source='editor_comments', read_only=True)
+
+    class Meta:
+        model = Article
+        fields = ['id', 'title', 'category', 'date', 'views', 'excerpt', 'status', 'editor_comments']
+
+    def get_date(self, obj):
+        return obj.created_at.strftime("%b %d, %Y")
+    
+    def get_views(self, obj):
+        from .models import ArticleInteraction
+        return ArticleInteraction.objects.filter(article=obj).count()
+    
+    def get_excerpt(self, obj):
+        return obj.content[:100] + '...' if len(obj.content) > 100 else obj.content
+    
+    def get_status(self, obj):
+        if obj.status == 'approved':
+            return 'published'
+        elif obj.status == 'rejected':
+            return 'rejected'
+        return obj.status

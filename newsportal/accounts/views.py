@@ -18,7 +18,9 @@ from rest_framework.reverse import reverse
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from news.models import Article, Category
-from news.serializers import ArticleSerializer, EditorDashboardArticleSerializer, EditorPublishedArticleSerializer, EditorPendingReviewArticleSerializer
+from news.serializers import ArticleSerializer, EditorDashboardArticleSerializer, EditorPublishedArticleSerializer, EditorPendingReviewArticleSerializer, AuthorDraftArticleSerializer, AuthorUpdatesArticleSerializer
+from datetime import timedelta
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -322,3 +324,105 @@ class AuthorExpertiseChoicesView(APIView):
                 {'value': choice[0], 'label': choice[1]} for choice in AuthorProfile.EXPERTISE_CHOICES
             ]
         })
+
+class AuthorDraftsSummaryView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        now = timezone.now()
+        last_month = now - timedelta(days=30)
+        last_week = now - timedelta(days=7)
+        # Drafts
+        total_drafts = Article.objects.filter(author=user, status='draft').count()
+        last_month_drafts = Article.objects.filter(author=user, status='draft', created_at__gte=last_month).count()
+        # Submitted Drafts
+        submitted_drafts = Article.objects.filter(author=user, status='pending').count()
+        last_month_submitted = Article.objects.filter(author=user, status='pending', created_at__gte=last_month).count()
+        # Pending Approval
+        pending_approval = Article.objects.filter(author=user, status='pending').count()
+        last_week_pending = Article.objects.filter(author=user, status='pending', created_at__gte=last_week).count()
+        return Response({
+            'total_drafts': total_drafts,
+            'total_drafts_delta': total_drafts - last_month_drafts,
+            'submitted_drafts': submitted_drafts,
+            'submitted_drafts_delta': submitted_drafts - last_month_submitted,
+            'pending_approval': pending_approval,
+            'pending_approval_delta': pending_approval - last_week_pending,
+        })
+
+class AuthorReviewsSummaryView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        now = timezone.now()
+        last_month = now - timedelta(days=30)
+        last_week = now - timedelta(days=7)
+        # Submitted Articles
+        submitted_articles = Article.objects.filter(author=user, status='pending').count()
+        last_month_submitted = Article.objects.filter(author=user, status='pending', created_at__gte=last_month).count()
+        # Under Review
+        under_review = Article.objects.filter(author=user, status='pending').count()
+        last_month_under_review = Article.objects.filter(author=user, status='pending', created_at__gte=last_month).count()
+        # Awaiting Feedback (rejected in last week)
+        awaiting_feedback = Article.objects.filter(author=user, status='rejected', updated_at__gte=last_week).count()
+        last_week_awaiting = Article.objects.filter(author=user, status='rejected', updated_at__gte=last_week).count()
+        return Response({
+            'submitted_articles': submitted_articles,
+            'submitted_articles_delta': submitted_articles - last_month_submitted,
+            'under_review': under_review,
+            'under_review_delta': under_review - last_month_under_review,
+            'awaiting_feedback': awaiting_feedback,
+            'awaiting_feedback_delta': awaiting_feedback - last_week_awaiting,
+        })
+
+class AuthorUpdatesSummaryView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        now = timezone.now()
+        last_month = now - timedelta(days=30)
+        last_week = now - timedelta(days=7)
+        # Published Articles
+        published_articles = Article.objects.filter(author=user, status='approved').count()
+        last_month_published = Article.objects.filter(author=user, status='approved', created_at__gte=last_month).count()
+        # Rejected Articles
+        rejected_articles = Article.objects.filter(author=user, status='rejected').count()
+        last_month_rejected = Article.objects.filter(author=user, status='rejected', created_at__gte=last_month).count()
+        # Article Views (sum of all views for author's articles)
+        from news.models import ArticleInteraction
+        article_ids = Article.objects.filter(author=user).values_list('id', flat=True)
+        article_views = ArticleInteraction.objects.filter(article_id__in=article_ids).count()
+        last_week_views = ArticleInteraction.objects.filter(article_id__in=article_ids, created_at__gte=last_week).count()
+        return Response({
+            'published_articles': published_articles,
+            'published_articles_delta': published_articles - last_month_published,
+            'rejected_articles': rejected_articles,
+            'rejected_articles_delta': rejected_articles - last_month_rejected,
+            'article_views': article_views,
+            'article_views_delta': article_views - last_week_views,
+        })
+
+class AuthorDraftsListView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        drafts = Article.objects.filter(author=user, status='draft').order_by('-created_at')
+        data = AuthorDraftArticleSerializer(drafts, many=True).data
+        return Response(data)
+
+class AuthorPendingReviewsListView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        pending = Article.objects.filter(author=user, status='pending').order_by('-created_at')
+        # Serializer to be updated in next step
+        data = EditorPendingReviewArticleSerializer(pending, many=True).data
+        return Response(data)
+
+class AuthorUpdatesListView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        updates = Article.objects.filter(author=user, status__in=['approved', 'rejected']).order_by('-created_at')
+        data = AuthorUpdatesArticleSerializer(updates, many=True).data
+        return Response(data)

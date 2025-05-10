@@ -5,14 +5,9 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from .models import FetchedNews
 from .services import NewsDataIOService
+from .serializers import FetchedNewsSerializer
 
 # Create your views here.
-
-class FetchedNewsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FetchedNews
-        fields = ['id', 'title', 'description', 'content', 'source_url', 
-                 'image_url', 'published_at', 'category']
 
 class FetchedNewsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = FetchedNews.objects.all()
