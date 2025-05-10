@@ -18,7 +18,7 @@ from rest_framework.reverse import reverse
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from news.models import Article, Category
-from news.serializers import ArticleSerializer
+from news.serializers import ArticleSerializer, EditorDashboardArticleSerializer
 
 User = get_user_model()
 
@@ -235,7 +235,7 @@ class EditorDashboardView(APIView):
         published_articles = Article.objects.filter(status='approved').count()
         pending_reviews = Article.objects.filter(status='pending').count()
         recent_articles = Article.objects.order_by('-created_at')[:7]
-        recent_data = ArticleSerializer(recent_articles, many=True).data
+        recent_data = EditorDashboardArticleSerializer(recent_articles, many=True).data
         return Response({
             'total_articles': total_articles,
             'published_articles': published_articles,

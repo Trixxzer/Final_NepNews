@@ -19,3 +19,12 @@ class ArticleInteractionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ArticleInteraction
         fields = ['liked', 'disliked']
+
+class EditorDashboardArticleSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(source='author.username', read_only=True)
+    category = serializers.CharField(source='category.name', read_only=True)
+    date = serializers.DateField(source='created_at', format="%b %d, %Y", read_only=True)
+
+    class Meta:
+        model = Article
+        fields = ['id', 'title', 'author', 'category', 'date']
