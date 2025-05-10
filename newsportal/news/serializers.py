@@ -31,3 +31,51 @@ class EditorDashboardArticleSerializer(serializers.ModelSerializer):
 
     def get_date(self, obj):
         return obj.created_at.strftime("%b %d, %Y")
+
+class EditorPublishedArticleSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(source='author.username', read_only=True)
+    category = serializers.CharField(source='category.name', read_only=True)
+    date = serializers.SerializerMethodField()
+    excerpt = serializers.SerializerMethodField()
+    views = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Article
+        fields = ['id', 'title', 'author', 'category', 'date', 'views', 'comments', 'excerpt', 'status']
+
+    def get_date(self, obj):
+        return obj.created_at.strftime("%b %d, %Y")
+    
+    def get_excerpt(self, obj):
+        # Get first 100 characters of content as excerpt
+        return obj.content[:100] + '...' if len(obj.content) > 100 else obj.content
+
+    def get_views(self, obj):
+        # Get total views from ArticleInteraction
+        return ArticleInteraction.objects.filter(article=obj).count()
+
+    def get_comments(self, obj):
+        # Get total comments
+        return Comment.objects.filter(article=obj).count()
+
+    def get_status(self, obj):
+        # Return 'published' instead of 'approved'
+        return 'published' if obj.status == 'approved' else obj.status
+
+class EditorPendingReviewArticleSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(source='author.username', read_only=True)
+    category = serializers.CharField(source='category.name', read_only=True)
+    date = serializers.SerializerMethodField()
+    excerpt = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Article
+        fields = ['id', 'title', 'author', 'category', 'date', 'excerpt', 'status']
+
+    def get_date(self, obj):
+        return obj.created_at.strftime("%b %d, %Y")
+    
+    def get_excerpt(self, obj):
+        return obj.content[:100] + '...' if len(obj.content) > 100 else obj.content

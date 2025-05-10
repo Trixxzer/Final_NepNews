@@ -18,7 +18,7 @@ from rest_framework.reverse import reverse
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from news.models import Article, Category
-from news.serializers import ArticleSerializer, EditorDashboardArticleSerializer
+from news.serializers import ArticleSerializer, EditorDashboardArticleSerializer, EditorPublishedArticleSerializer, EditorPendingReviewArticleSerializer
 
 User = get_user_model()
 
@@ -247,14 +247,14 @@ class EditorPublishedArticlesView(APIView):
     permission_classes = [IsAuthenticated, EditorPermission]
     def get(self, request):
         articles = Article.objects.filter(status='approved')
-        data = ArticleSerializer(articles, many=True).data
+        data = EditorPublishedArticleSerializer(articles, many=True).data
         return Response(data)
 
 class EditorPendingReviewsView(APIView):
     permission_classes = [IsAuthenticated, EditorPermission]
     def get(self, request):
         articles = Article.objects.filter(status='pending')
-        data = ArticleSerializer(articles, many=True).data
+        data = EditorPendingReviewArticleSerializer(articles, many=True).data
         return Response(data)
 
 class EditorArticleDetailView(APIView):
