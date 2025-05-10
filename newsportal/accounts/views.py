@@ -18,7 +18,7 @@ from rest_framework.reverse import reverse
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from news.models import Article, Category
-from news.serializers import ArticleSerializer, EditorDashboardArticleSerializer, EditorPublishedArticleSerializer, EditorPendingReviewArticleSerializer, AuthorDraftArticleSerializer, AuthorUpdatesArticleSerializer
+from news.serializers import ArticleSerializer, EditorDashboardArticleSerializer, EditorPublishedArticleSerializer, EditorPendingReviewArticleSerializer, AuthorDraftArticleSerializer, AuthorPendingReviewArticleSerializer, AuthorUpdatesArticleSerializer
 from datetime import timedelta
 from django.utils import timezone
 
@@ -415,8 +415,7 @@ class AuthorPendingReviewsListView(APIView):
     def get(self, request):
         user = request.user
         pending = Article.objects.filter(author=user, status='pending').order_by('-created_at')
-        # Serializer to be updated in next step
-        data = EditorPendingReviewArticleSerializer(pending, many=True).data
+        data = AuthorPendingReviewArticleSerializer(pending, many=True).data
         return Response(data)
 
 class AuthorUpdatesListView(APIView):
@@ -426,38 +425,3 @@ class AuthorUpdatesListView(APIView):
         updates = Article.objects.filter(author=user, status__in=['approved', 'rejected']).order_by('-created_at')
         data = AuthorUpdatesArticleSerializer(updates, many=True).data
         return Response(data)
-
-class AuthorArticleCreateView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request):
-        serializer = ArticleSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(author=request.user)
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
-
-class AuthorArticleUpdateView(APIView):
-    permission_classes = [IsAuthenticated]
-    def patch(self, request, pk):
-        try:
-            article = Article.objects.get(pk=pk, author=request.user)
-        except Article.DoesNotExist:
-            return Response({'error': 'Article not found'}, status=404)
-        serializer = ArticleSerializer(article, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
-
-class AuthorSubmitForReviewView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request, pk):
-        try:
-            article = Article.objects.get(pk=pk, author=request.user)
-        except Article.DoesNotExist:
-            return Response({'error': 'Article not found'}, status=404)
-        if article.status != 'draft':
-            return Response({'error': 'Only draft articles can be submitted for review.'}, status=400)
-        article.status = 'pending'
-        article.save()
-        return Response(AuthorDraftArticleSerializer(article).data)

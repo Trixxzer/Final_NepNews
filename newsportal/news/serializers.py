@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import Article, Comment, ArticleInteraction
 
 class ArticleSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='category.name', read_only=True)
+    status = serializers.CharField(source='get_status_display', read_only=True)
     class Meta:
         model = Article
         fields = ['id', 'title', 'content', 'category', 'status', 'created_at', 'updated_at', 'editor_comments']
@@ -95,27 +97,35 @@ class AuthorDraftArticleSerializer(serializers.ModelSerializer):
     def get_status(self, obj):
         return 'draft' if obj.status == 'draft' else obj.status
 
-class AuthorUpdatesArticleSerializer(serializers.ModelSerializer):
+class AuthorPendingReviewArticleSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source='category.name', read_only=True)
     date = serializers.SerializerMethodField()
-    views = serializers.SerializerMethodField()
-    excerpt = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
-    editor_comments = serializers.CharField(source='editor_comments', read_only=True)
+    editorial_feedback = serializers.CharField(source='editor_comments', read_only=True)
 
     class Meta:
         model = Article
-        fields = ['id', 'title', 'category', 'date', 'views', 'excerpt', 'status', 'editor_comments']
+        fields = ['id', 'title', 'category', 'date', 'status', 'editorial_feedback']
 
     def get_date(self, obj):
         return obj.created_at.strftime("%b %d, %Y")
     
-    def get_views(self, obj):
-        from .models import ArticleInteraction
-        return ArticleInteraction.objects.filter(article=obj).count()
-    
-    def get_excerpt(self, obj):
-        return obj.content[:100] + '...' if len(obj.content) > 100 else obj.content
+    def get_status(self, obj):
+        return 'pending' if obj.status == 'pending' else obj.status
+
+class AuthorUpdatesArticleSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='category.name', read_only=True)
+    date = serializers.SerializerMethodField()
+    views = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    editorial_feedback = serializers.CharField(source='editor_comments', read_only=True)
+
+    class Meta:
+        model = Article
+        fields = ['id', 'title', 'category', 'date', 'status', 'views', 'editorial_feedback']
+
+    def get_date(self, obj):
+        return obj.created_at.strftime("%b %d, %Y")
     
     def get_status(self, obj):
         if obj.status == 'approved':
@@ -123,3 +133,7 @@ class AuthorUpdatesArticleSerializer(serializers.ModelSerializer):
         elif obj.status == 'rejected':
             return 'rejected'
         return obj.status
+    
+    def get_views(self, obj):
+        from .models import ArticleInteraction
+        return ArticleInteraction.objects.filter(article=obj).count()

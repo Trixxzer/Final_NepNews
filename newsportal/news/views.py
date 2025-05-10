@@ -94,9 +94,19 @@ class AuthorArticleViewSet(viewsets.ModelViewSet):
 def author_api_overview(request):
     api_urls = {
         'List All Articles': {
-            'endpoint': '/api/author/articles/',
+            'endpoint': '/accounts/author/drafts/',
             'method': 'GET',
-            'description': 'View all articles by the author'
+            'description': 'List all draft articles for the author (dashboard)'
+        },
+        'List Pending Reviews': {
+            'endpoint': '/accounts/author/pending-reviews/',
+            'method': 'GET',
+            'description': 'List all articles under review for the author (dashboard)'
+        },
+        'List Updates': {
+            'endpoint': '/accounts/author/updates/',
+            'method': 'GET',
+            'description': 'List all published/rejected articles for the author (dashboard)'
         },
         'Create Article': {
             'endpoint': '/api/author/articles/',
@@ -104,7 +114,6 @@ def author_api_overview(request):
             'fields': {
                 'title': 'string',
                 'content': 'string',
-                'description': 'string',
                 'image': 'file (optional)',
                 'category': 'integer'
             }
@@ -124,10 +133,6 @@ def author_api_overview(request):
         'Submit for Review': {
             'endpoint': '/api/author/articles/<id>/submit_for_review/',
             'method': 'POST'
-        },
-        'Check Status': {
-            'endpoint': '/api/author/articles/<id>/get_status/',
-            'method': 'GET'
         }
     }
     return Response(api_urls)
