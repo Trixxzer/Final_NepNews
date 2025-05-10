@@ -44,6 +44,7 @@ class AuthorProfile(models.Model):
     approval_status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='pending')
     approval_comment = models.TextField(blank=True, null=True)
     approved_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_authors')
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
 # Profile for Editor
 class EditorProfile(models.Model):
@@ -53,11 +54,13 @@ class EditorProfile(models.Model):
     approval_status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='pending')
     approval_comment = models.TextField(blank=True, null=True)
     approved_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_editors')
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
 # Profile for Admin
 class AdminProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='admin_profile')
     approval_document = models.FileField(upload_to='admin_approval_docs/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
 class EmailVerificationToken(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

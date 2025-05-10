@@ -52,10 +52,10 @@ class NewsDataIOService:
                             source_id=source_id,
                             defaults={
                                 'title': article.get('title'),
-                                'description': article.get('description'),
+                                'summary': article.get('description'),
                                 'content': article.get('content'),
                                 'source_url': article.get('link'),
-                                'image_url': article.get('image_url'),
+                                'image': article.get('image_url'),
                                 'published_at': published_at,
                                 'category': article.get('category')[0] if article.get('category') else None,
                             }

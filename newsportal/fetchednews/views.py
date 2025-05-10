@@ -18,6 +18,13 @@ class FetchedNewsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = FetchedNews.objects.all()
     serializer_class = FetchedNewsSerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        category = self.request.query_params.get('category')
+        if category:
+            queryset = queryset.filter(category__iexact=category)
+        return queryset
+
     @action(detail=False, methods=['post'])
     def fetch_nepal_news(self, request):
         """

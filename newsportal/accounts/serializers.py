@@ -17,19 +17,19 @@ class AuthorProfileSerializer(serializers.ModelSerializer):
     category_expertise = serializers.ChoiceField(choices=AuthorProfile.EXPERTISE_CHOICES)
     class Meta:
         model = AuthorProfile
-        fields = ['bio', 'category_expertise', 'certificates', 'approval_status', 'approval_comment', 'approved_by']
+        fields = ['bio', 'category_expertise', 'certificates', 'approval_status', 'approval_comment', 'approved_by', 'profile_picture']
         read_only_fields = ['approval_status', 'approval_comment', 'approved_by']
 
 class EditorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = EditorProfile
-        fields = ['areas_of_oversight', 'management_responsibilities', 'approval_status', 'approval_comment', 'approved_by']
+        fields = ['areas_of_oversight', 'management_responsibilities', 'approval_status', 'approval_comment', 'approved_by', 'profile_picture']
         read_only_fields = ['approval_status', 'approval_comment', 'approved_by']
 
 class AdminProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminProfile
-        fields = ['approval_document']
+        fields = ['approval_document', 'profile_picture']
 
 class UserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True, required=True)
@@ -88,17 +88,19 @@ class UserSerializer(serializers.ModelSerializer):
                     bio=bio,
                     category_expertise=category_expertise,
                     certificates=certificates,
-                    approval_status='pending'
+                    approval_status='pending',
+                    profile_picture=profile_picture
                 )
             elif role == 'editor':
                 EditorProfile.objects.create(
                     user=user,
                     areas_of_oversight=areas_of_oversight,
                     management_responsibilities=management_responsibilities or [],
-                    approval_status='pending'
+                    approval_status='pending',
+                    profile_picture=profile_picture
                 )
             elif role == 'admin':
-                AdminProfile.objects.create(user=user, approval_document=approval_document)
+                AdminProfile.objects.create(user=user, approval_document=approval_document, profile_picture=profile_picture)
             return user
 
 
