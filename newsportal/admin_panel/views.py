@@ -1,5 +1,5 @@
 from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Count
@@ -296,6 +296,7 @@ class RoleChangeRequestViewSet(viewsets.ModelViewSet):
         data = []
         for req in requests:
             data.append({
+                "id": req.id,
                 "user_name": req.user.username,
                 "role": req.user.role,
                 "requested_role": req.requested_role,
@@ -304,53 +305,69 @@ class RoleChangeRequestViewSet(viewsets.ModelViewSet):
             })
         return Response(data)
 
-    def perform_create(self, serializer):
-        instance = serializer.save()
-        AdminLog.objects.create(
-            action='role_change_request',
-            user=instance.user,
-            content_type='user',
-            object_id=instance.user.id,
-            description=f'{instance.user.role.capitalize()} {instance.user.username} requested role change to {instance.requested_role}'
-        )
-
-    @action(detail=True, methods=['post'])
-    def approve(self, request, pk=None):
-        req = self.get_object()
+    def post(self, request, *args, **kwargs):
+        # Admin can approve or reject a role change request from the list endpoint
+        req_id = request.data.get('id')
+        action = request.data.get('action')  # 'accept' or 'reject'
+        if not req_id or action not in ['accept', 'reject']:
+            return Response({'error': 'id and action (accept or reject) are required.'}, status=400)
+        try:
+            req = RoleChangeRequest.objects.get(id=req_id)
+        except RoleChangeRequest.DoesNotExist:
+            return Response({'error': 'Role change request not found.'}, status=404)
         if req.status != 'pending':
             return Response({'error': 'Request already processed'}, status=400)
+        if action == 'accept':
+            req.status = 'approved'
+            req.decision_date = datetime.now()
+            req.save()
+            user = req.user
+            user.role = req.requested_role
+            user.save()
+            return Response({'status': 'approved'})
+        else:
+            req.status = 'rejected'
+            req.decision_date = datetime.now()
+            req.save()
+            return Response({'status': 'rejected'})
+
+@api_view(['GET', 'POST'])
+@permission_classes([AdminPermission])
+def role_change_action(request):
+    if request.method == 'GET':
+        requests = RoleChangeRequest.objects.filter(status='pending').order_by('-request_date')
+        data = []
+        for req in requests:
+            data.append({
+                "id": req.id,
+                "user_name": req.user.username,
+                "role": req.user.role,
+                "requested_role": req.requested_role,
+                "date": req.request_date.strftime("%b %d, %Y"),
+                "action": "accept?reject"
+            })
+        return Response(data)
+    # POST method for approve/reject
+    req_id = request.data.get('id')
+    action = request.data.get('action')  # 'accept' or 'reject'
+    if not req_id or action not in ['accept', 'reject']:
+        return Response({'error': 'id and action (accept or reject) are required.'}, status=400)
+    try:
+        req = RoleChangeRequest.objects.get(id=req_id)
+    except RoleChangeRequest.DoesNotExist:
+        return Response({'error': 'Role change request not found.'}, status=404)
+    if req.status != 'pending':
+        return Response({'error': 'Request already processed'}, status=400)
+    if action == 'accept':
         req.status = 'approved'
         req.decision_date = datetime.now()
-        req.admin_comment = request.data.get('admin_comment', '')
         req.save()
-        # Change user role
         user = req.user
-        old_role = user.role
         user.role = req.requested_role
         user.save()
-        AdminLog.objects.create(
-            action='approve_role_change',
-            user=request.user,
-            content_type='user',
-            object_id=user.id,
-            description=f'Approved role change from {old_role} to {req.requested_role}'
-        )
         return Response({'status': 'approved'})
-
-    @action(detail=True, methods=['post'])
-    def reject(self, request, pk=None):
-        req = self.get_object()
-        if req.status != 'pending':
-            return Response({'error': 'Request already processed'}, status=400)
+    else:
         req.status = 'rejected'
         req.decision_date = datetime.now()
-        req.admin_comment = request.data.get('admin_comment', '')
         req.save()
-        AdminLog.objects.create(
-            action='reject_role_change',
-            user=request.user,
-            content_type='user',
-            object_id=req.user.id,
-            description=f'Rejected role change to {req.requested_role}'
-        )
         return Response({'status': 'rejected'})

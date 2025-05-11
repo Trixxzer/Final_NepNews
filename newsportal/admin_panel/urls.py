@@ -10,7 +10,8 @@ from .views import (
     ApproveAuthorView,
     ApproveEditorView,
     AdminPanelApiRootView,
-    RoleChangeRequestViewSet
+    RoleChangeRequestViewSet,
+    role_change_action
 )
 
 app_name = 'admin_panel'
@@ -29,4 +30,5 @@ urlpatterns = [
     path('approval-requests/editors/', ApprovalRequestEditorsView.as_view(), name='approval-requests-editors'),
     path('approve-author/', ApproveAuthorView.as_view(), name='approve-author'),
     path('approve-editor/', ApproveEditorView.as_view(), name='approve-editor'),
+    path('role-change/', role_change_action, name='role-change'),
 ]
