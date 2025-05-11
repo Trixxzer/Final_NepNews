@@ -37,22 +37,51 @@ class DashboardView(APIView):
             if log.action == 'user_login':
                 activity_title = 'User Login'
                 status = 'Completed'
+                activity = {
+                    "activity_title": activity_title,
+                    "user_name": log.user.username,
+                    "role": getattr(log.user, 'role', ''),
+                    "date": log.timestamp.strftime("%b %d, %Y"),
+                    "status": status
+                }
             elif log.action == 'role_change_request':
                 activity_title = 'Role Change Request'
                 status = 'Pending'
+                # Try to get requested_role from the latest RoleChangeRequest for this user
+                requested_role = None
+                from accounts.models import RoleChangeRequest as RCR
+                rcr = RCR.objects.filter(user=log.user).order_by('-request_date').first()
+                if rcr:
+                    requested_role = rcr.requested_role
+                activity = {
+                    "activity_title": activity_title,
+                    "user_name": log.user.username,
+                    "role": getattr(log.user, 'role', ''),
+                    "requested_role": requested_role,
+                    "date": log.timestamp.strftime("%b %d, %Y"),
+                    "status": status
+                }
             elif log.action == 'new_user_registration':
                 activity_title = 'New User Registration'
                 status = 'Completed'
+                activity = {
+                    "activity_title": activity_title,
+                    "user_name": log.user.username,
+                    "role": getattr(log.user, 'role', ''),
+                    "date": log.timestamp.strftime("%b %d, %Y"),
+                    "status": status
+                }
             else:
                 activity_title = log.action.replace('_', ' ').title()
                 status = 'Completed'
-            activities.append({
-                "activity_title": activity_title,
-                "user_name": log.user.username,
-                "role": getattr(log.user, 'role', ''),
-                "date": log.timestamp.strftime("%b %d, %Y"),
-                "status": status
-            })
+                activity = {
+                    "activity_title": activity_title,
+                    "user_name": log.user.username,
+                    "role": getattr(log.user, 'role', ''),
+                    "date": log.timestamp.strftime("%b %d, %Y"),
+                    "status": status
+                }
+            activities.append(activity)
 
         return Response({
             "stats": [
