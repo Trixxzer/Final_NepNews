@@ -9,7 +9,8 @@ from .views import (
     ApprovalRequestEditorsView,
     ApproveAuthorView,
     ApproveEditorView,
-    AdminPanelApiRootView
+    AdminPanelApiRootView,
+    RoleChangeRequestViewSet
 )
 
 app_name = 'admin_panel'
@@ -18,6 +19,7 @@ router = DefaultRouter()
 router.register(r'articles', AdminArticleViewSet)
 router.register(r'users', AdminUserViewSet)
 router.register(r'logs', AdminLogViewSet)
+router.register(r'role-change-requests', RoleChangeRequestViewSet)
 
 urlpatterns = [
     path('', AdminPanelApiRootView.as_view(), name='admin_panel-api-root'),

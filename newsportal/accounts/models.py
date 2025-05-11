@@ -84,3 +84,19 @@ class PasswordResetToken(models.Model):
 
     def __str__(self):
         return f"PasswordResetToken for {self.user.username}"
+
+class RoleChangeRequest(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='role_change_requests')
+    requested_role = models.CharField(max_length=10)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    request_date = models.DateTimeField(auto_now_add=True)
+    decision_date = models.DateTimeField(null=True, blank=True)
+    admin_comment = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} requests {self.requested_role} ({self.status})"

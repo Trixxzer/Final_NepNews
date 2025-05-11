@@ -3,10 +3,11 @@ from .models import Article, Comment, ArticleInteraction
 
 class ArticleSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source='category.name', read_only=True)
+    category_id = serializers.IntegerField(write_only=True, required=True)
     status = serializers.CharField(source='get_status_display', read_only=True)
     class Meta:
         model = Article
-        fields = ['id', 'title', 'content', 'category', 'status', 'created_at', 'updated_at', 'editor_comments']
+        fields = ['id', 'title', 'content', 'category', 'category_id', 'status', 'created_at', 'updated_at', 'editor_comments']
         read_only_fields = ['author', 'status', 'editor_comments']
 
 class CommentSerializer(serializers.ModelSerializer):

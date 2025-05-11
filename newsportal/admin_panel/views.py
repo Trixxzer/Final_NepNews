@@ -7,9 +7,9 @@ from datetime import datetime, timedelta
 from rest_framework.reverse import reverse
 
 from .models import AdminLog
-from .serializers import AdminLogSerializer, AdminArticleSerializer, AdminUserSerializer, AuthorProfileSerializer, EditorProfileSerializer
+from .serializers import AdminLogSerializer, AdminArticleSerializer, AdminUserSerializer, AuthorProfileSerializer, EditorProfileSerializer, RoleChangeRequestSerializer
 from news.models import Article
-from accounts.models import CustomUser, AuthorProfile, EditorProfile
+from accounts.models import CustomUser, AuthorProfile, EditorProfile, RoleChangeRequest
 
 class AdminPermission(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -19,15 +19,10 @@ class DashboardView(APIView):
     permission_classes = [AdminPermission]
 
     def get(self, request):
-        # Get counts for dashboard
         total_users = CustomUser.objects.count()
-        total_articles = Article.objects.count()
-        pending_articles = Article.objects.filter(status='pending').count()
-        
-        # Get recent activity
+        active_authors = CustomUser.objects.filter(role='author', is_active=True).count()
+        pending_role_requests = RoleChangeRequest.objects.filter(status='pending').count()
         recent_logs = AdminLog.objects.all()[:5]
-        
-        # Get user registration trends (last 7 days)
         last_week = datetime.now() - timedelta(days=7)
         user_trends = CustomUser.objects.filter(
             date_joined__gte=last_week
@@ -37,8 +32,8 @@ class DashboardView(APIView):
 
         return Response({
             'total_users': total_users,
-            'total_articles': total_articles,
-            'pending_articles': pending_articles,
+            'active_authors': active_authors,
+            'pending_role_requests': pending_role_requests,
             'recent_activity': AdminLogSerializer(recent_logs, many=True).data,
             'user_trends': user_trends
         })
@@ -89,6 +84,25 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         )
         
         return Response({'is_active': user.is_active})
+
+    @action(detail=True, methods=['post'])
+    def change_role(self, request, pk=None):
+        user = self.get_object()
+        role = request.data.get('role')
+        valid_roles = ['reader', 'author', 'editor']
+        if role not in valid_roles:
+            return Response({'error': 'Invalid role'}, status=status.HTTP_400_BAD_REQUEST)
+        old_role = user.role
+        user.role = role
+        user.save()
+        AdminLog.objects.create(
+            action='change_user_role',
+            user=request.user,
+            content_type='user',
+            object_id=user.id,
+            description=f'Changed user role from {old_role} to {role}'
+        )
+        return Response({'role': user.role})
 
 class AdminLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AdminLog.objects.all()
@@ -187,3 +201,49 @@ class AdminPanelApiRootView(APIView):
             'approve-author': reverse('admin_panel:approve-author', request=request),
             'approve-editor': reverse('admin_panel:approve-editor', request=request),
         })
+
+class RoleChangeRequestViewSet(viewsets.ModelViewSet):
+    queryset = RoleChangeRequest.objects.all()
+    serializer_class = RoleChangeRequestSerializer
+    permission_classes = [AdminPermission]
+
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        req = self.get_object()
+        if req.status != 'pending':
+            return Response({'error': 'Request already processed'}, status=400)
+        req.status = 'approved'
+        req.decision_date = datetime.now()
+        req.admin_comment = request.data.get('admin_comment', '')
+        req.save()
+        # Change user role
+        user = req.user
+        old_role = user.role
+        user.role = req.requested_role
+        user.save()
+        AdminLog.objects.create(
+            action='approve_role_change',
+            user=request.user,
+            content_type='user',
+            object_id=user.id,
+            description=f'Approved role change from {old_role} to {req.requested_role}'
+        )
+        return Response({'status': 'approved'})
+
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        req = self.get_object()
+        if req.status != 'pending':
+            return Response({'error': 'Request already processed'}, status=400)
+        req.status = 'rejected'
+        req.decision_date = datetime.now()
+        req.admin_comment = request.data.get('admin_comment', '')
+        req.save()
+        AdminLog.objects.create(
+            action='reject_role_change',
+            user=request.user,
+            content_type='user',
+            object_id=req.user.id,
+            description=f'Rejected role change to {req.requested_role}'
+        )
+        return Response({'status': 'rejected'})
