@@ -69,7 +69,7 @@ class AuthorArticleViewSet(viewsets.ModelViewSet):
         return Article.objects.filter(author=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(author=self.request.user, status='pending')
 
     @action(detail=True, methods=['post'])
     def submit_for_review(self, request, pk=None):
