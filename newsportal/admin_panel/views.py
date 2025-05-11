@@ -108,6 +108,19 @@ class AdminUserViewSet(viewsets.ModelViewSet):
     serializer_class = AdminUserSerializer
     permission_classes = [AdminPermission]
 
+    def list(self, request, *args, **kwargs):
+        users = self.get_queryset()
+        user_data = []
+        for user in users:
+            user_data.append({
+                "name": user.username,
+                "email": user.email,
+                "current_role": user.role.capitalize(),
+                "status": "Active" if user.is_active else "Inactive",
+                "actions": ["Change Role"]  # Placeholder for actions
+            })
+        return Response(user_data)
+
     @action(detail=True, methods=['post'])
     def toggle_active(self, request, pk=None):
         user = self.get_object()
