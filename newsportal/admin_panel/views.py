@@ -144,9 +144,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
             user_data.append({
                 "name": user.username,
                 "email": user.email,
-                "current_role": user.role.capitalize(),
-                "status": "Active" if user.is_active else "Inactive",
-                "actions": ["Change Role"]  # Placeholder for actions
+                "current_role": user.role.capitalize()
             })
         return Response(user_data)
 
