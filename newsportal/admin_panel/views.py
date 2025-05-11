@@ -28,21 +28,24 @@ class DashboardView(APIView):
         active_authors_trend = "+8% from last month"
         pending_role_requests_trend = "-5% from last month"
 
-        # Recent Activities
-        recent_logs = AdminLog.objects.order_by('-timestamp')[:5]
+        # Recent Activities: user_login, role_change_request, new_user_registration
+        recent_logs = AdminLog.objects.filter(
+            action__in=['user_login', 'role_change_request', 'new_user_registration']
+        ).order_by('-timestamp')[:10]
         activities = []
         for log in recent_logs:
-            # Map action to activity title and status
-            action_map = {
-                'new_user_registration': ('New User Registration', 'Completed'),
-                'role_change_request': ('Role Change Request', 'Pending'),
-                'article_submission': ('Article Submission', 'Completed'),
-                'account_deactivation': ('Account Deactivation', 'Completed'),
-                'change_user_role': ('Role Change Request', 'Completed'),
-                'approve_role_change': ('Role Change Request', 'Completed'),
-                'reject_role_change': ('Role Change Request', 'Pending'),
-            }
-            activity_title, status = action_map.get(log.action, (log.action.replace('_', ' ').title(), 'Completed'))
+            if log.action == 'user_login':
+                activity_title = 'User Login'
+                status = 'Completed'
+            elif log.action == 'role_change_request':
+                activity_title = 'Role Change Request'
+                status = 'Pending'
+            elif log.action == 'new_user_registration':
+                activity_title = 'New User Registration'
+                status = 'Completed'
+            else:
+                activity_title = log.action.replace('_', ' ').title()
+                status = 'Completed'
             activities.append({
                 "activity_title": activity_title,
                 "user_name": log.user.username,
@@ -242,7 +245,21 @@ class AdminPanelApiRootView(APIView):
 class RoleChangeRequestViewSet(viewsets.ModelViewSet):
     queryset = RoleChangeRequest.objects.all()
     serializer_class = RoleChangeRequestSerializer
-    permission_classes = [AdminPermission]
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [permissions.IsAuthenticated()]
+        return [AdminPermission()]
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        AdminLog.objects.create(
+            action='role_change_request',
+            user=instance.user,
+            content_type='user',
+            object_id=instance.user.id,
+            description=f'{instance.user.role.capitalize()} {instance.user.username} requested role change to {instance.requested_role}'
+        )
 
     @action(detail=True, methods=['post'])
     def approve(self, request, pk=None):

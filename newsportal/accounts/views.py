@@ -21,6 +21,7 @@ from news.models import Article, Category
 from news.serializers import ArticleSerializer, EditorDashboardArticleSerializer, EditorPublishedArticleSerializer, EditorPendingReviewArticleSerializer, AuthorDraftArticleSerializer, AuthorPendingReviewArticleSerializer, AuthorUpdatesArticleSerializer
 from datetime import timedelta
 from django.utils import timezone
+from admin_panel.models import AdminLog
 
 User = get_user_model()
 
@@ -42,6 +43,14 @@ class RegisterView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             token, _ = Token.objects.get_or_create(user=user)
+            # Log new user registration
+            AdminLog.objects.create(
+                action='new_user_registration',
+                user=user,
+                content_type='user',
+                object_id=user.id,
+                description=f'User {user.username} registered'
+            )
             return Response({
                 'token': token.key,
                 'user_id': user.id,
@@ -67,6 +76,14 @@ class LoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data['user']
             token, _ = Token.objects.get_or_create(user=user)
+            # Log login event
+            AdminLog.objects.create(
+                action='user_login',
+                user=user,
+                content_type='user',
+                object_id=user.id,
+                description=f'{user.role.capitalize()} {user.username} logged in'
+            )
             return Response({
                 'token': token.key,
                 'user_id': user.id,
