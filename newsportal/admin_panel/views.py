@@ -291,6 +291,19 @@ class RoleChangeRequestViewSet(viewsets.ModelViewSet):
             return [permissions.IsAuthenticated()]
         return [AdminPermission()]
 
+    def list(self, request, *args, **kwargs):
+        requests = self.get_queryset().order_by('-request_date')
+        data = []
+        for req in requests:
+            data.append({
+                "user_name": req.user.username,
+                "role": req.user.role,
+                "requested_role": req.requested_role,
+                "date": req.request_date.strftime("%b %d, %Y"),
+                "action": "accept?reject"
+            })
+        return Response(data)
+
     def perform_create(self, serializer):
         instance = serializer.save()
         AdminLog.objects.create(
