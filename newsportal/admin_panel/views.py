@@ -22,20 +22,57 @@ class DashboardView(APIView):
         total_users = CustomUser.objects.count()
         active_authors = CustomUser.objects.filter(role='author', is_active=True).count()
         pending_role_requests = RoleChangeRequest.objects.filter(status='pending').count()
-        recent_logs = AdminLog.objects.all()[:5]
-        last_week = datetime.now() - timedelta(days=7)
-        user_trends = CustomUser.objects.filter(
-            date_joined__gte=last_week
-        ).extra(
-            select={'date': 'date(date_joined)'}
-        ).values('date').annotate(count=Count('id'))
+
+        # Dummy trend values (replace with real calculations if needed)
+        total_users_trend = "+12% from last month"
+        active_authors_trend = "+8% from last month"
+        pending_role_requests_trend = "-5% from last month"
+
+        # Recent Activities
+        recent_logs = AdminLog.objects.order_by('-timestamp')[:5]
+        activities = []
+        for log in recent_logs:
+            # Map action to activity title and status
+            action_map = {
+                'new_user_registration': ('New User Registration', 'Completed'),
+                'role_change_request': ('Role Change Request', 'Pending'),
+                'article_submission': ('Article Submission', 'Completed'),
+                'account_deactivation': ('Account Deactivation', 'Completed'),
+                'change_user_role': ('Role Change Request', 'Completed'),
+                'approve_role_change': ('Role Change Request', 'Completed'),
+                'reject_role_change': ('Role Change Request', 'Pending'),
+            }
+            activity_title, status = action_map.get(log.action, (log.action.replace('_', ' ').title(), 'Completed'))
+            activities.append({
+                "activity_title": activity_title,
+                "user_name": log.user.username,
+                "role": getattr(log.user, 'role', ''),
+                "date": log.timestamp.strftime("%b %d, %Y"),
+                "status": status
+            })
 
         return Response({
-            'total_users': total_users,
-            'active_authors': active_authors,
-            'pending_role_requests': pending_role_requests,
-            'recent_activity': AdminLogSerializer(recent_logs, many=True).data,
-            'user_trends': user_trends
+            "stats": [
+                {
+                    "title": "Total Users",
+                    "value": total_users,
+                    "trend": total_users_trend,
+                    "trendPositive": True
+                },
+                {
+                    "title": "Active Authors",
+                    "value": active_authors,
+                    "trend": active_authors_trend,
+                    "trendPositive": True
+                },
+                {
+                    "title": "Pending Role Requests",
+                    "value": pending_role_requests,
+                    "trend": pending_role_requests_trend,
+                    "trendPositive": False
+                }
+            ],
+            "recent_activities": activities
         })
 
 class AdminArticleViewSet(viewsets.ModelViewSet):
