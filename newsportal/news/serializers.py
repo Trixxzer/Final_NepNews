@@ -5,10 +5,23 @@ class ArticleSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source='category.name', read_only=True)
     category_id = serializers.IntegerField(write_only=True, required=True)
     status = serializers.CharField(source='get_status_display', read_only=True)
+
+    ALLOWED_CATEGORIES = ['Technology', 'Politics', 'Science', 'Health', 'Business']
+
     class Meta:
         model = Article
         fields = ['id', 'title', 'content', 'category', 'category_id', 'status', 'created_at', 'updated_at', 'editor_comments']
         read_only_fields = ['author', 'status', 'editor_comments']
+
+    def validate_category_id(self, value):
+        from .models import Category
+        try:
+            category = Category.objects.get(id=value)
+        except Category.DoesNotExist:
+            raise serializers.ValidationError('Invalid category.')
+        if category.name not in self.ALLOWED_CATEGORIES:
+            raise serializers.ValidationError(f"Category must be one of: {', '.join(self.ALLOWED_CATEGORIES)}")
+        return value
 
 class CommentSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.username', read_only=True)
@@ -120,10 +133,11 @@ class AuthorUpdatesArticleSerializer(serializers.ModelSerializer):
     views = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     editorial_feedback = serializers.CharField(source='editor_comments', read_only=True)
+    content = serializers.CharField(read_only=True)
 
     class Meta:
         model = Article
-        fields = ['id', 'title', 'category', 'date', 'status', 'views', 'editorial_feedback']
+        fields = ['id', 'title', 'category', 'date', 'status', 'views', 'editorial_feedback', 'content']
 
     def get_date(self, obj):
         return obj.created_at.strftime("%b %d, %Y")

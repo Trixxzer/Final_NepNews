@@ -233,14 +233,14 @@ class EditorPermission(permissions.BasePermission):
 class EditorDashboardView(APIView):
     permission_classes = [IsAuthenticated, EditorPermission]
     def get(self, request):
-        total_articles = Article.objects.count()
         published_articles = Article.objects.filter(status='approved').count()
+        rejected_articles = Article.objects.filter(status='rejected').count()
         pending_reviews = Article.objects.filter(status='pending').count()
         recent_articles = Article.objects.order_by('-created_at')[:7]
-        recent_data = EditorDashboardArticleSerializer(recent_articles, many=True).data
+        recent_data = AuthorUpdatesArticleSerializer(recent_articles, many=True).data
         return Response({
-            'total_articles': total_articles,
             'published_articles': published_articles,
+            'rejected_articles': rejected_articles,
             'pending_reviews': pending_reviews,
             'recent_articles': recent_data
         })
@@ -425,3 +425,25 @@ class AuthorUpdatesListView(APIView):
         updates = Article.objects.filter(author=user, status__in=['approved', 'rejected']).order_by('-created_at')
         data = AuthorUpdatesArticleSerializer(updates, many=True).data
         return Response(data)
+
+class AuthorDashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        published_articles = Article.objects.filter(author=user, status='approved').count()
+        rejected_articles = Article.objects.filter(author=user, status='rejected').count()
+        pending_reviews = Article.objects.filter(author=user, status='pending').count()
+        recent_articles = Article.objects.filter(author=user).order_by('-created_at')[:7]
+        recent_data = AuthorUpdatesArticleSerializer(recent_articles, many=True).data
+        # Remove 'views' from each article dict
+        for article in recent_data:
+            if 'views' in article:
+                del article['views']
+            # Add 'content' field
+            article['content'] = article.get('content', '')
+        return Response({
+            'published_articles': published_articles,
+            'rejected_articles': rejected_articles,
+            'pending_reviews': pending_reviews,
+            'recent_articles': recent_data
+        })
