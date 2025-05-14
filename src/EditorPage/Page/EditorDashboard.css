@@ -1,0 +1,57 @@
+.editor-dashboard-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100vh;
+  background-color: #e5e7eb;
+  overflow: hidden;
+}
+
+.editor-dashboard-content {
+  flex: 1;
+  padding: 34px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.editor-stats-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.editor-stats-container > div {
+  flex: 1;
+  max-width: 300px;
+}
+
+@media (max-width: 991px) {
+  .editor-dashboard-container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .editor-dashboard-content {
+    padding: 20px;
+    height: auto;
+    overflow-y: visible;
+  }
+
+  .editor-stats-container {
+    flex-direction: column;
+  }
+
+  .editor-stats-container > div {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .editor-dashboard-content {
+    padding: 10px;
+  }
+}

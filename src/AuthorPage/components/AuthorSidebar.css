@@ -1,0 +1,128 @@
+.author-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  line-height: normal;
+  width: 19%;
+  margin-left: 0;
+  height: 100%;
+}
+
+.author-sidebar-content {
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  margin-left: auto;
+  margin-right: 0;
+  width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 19%;
+  overflow-y: auto;
+}
+
+.author-logo-container {
+  background-color: transparent;
+  border-color: rgba(229, 231, 235, 0.5);
+  border-bottom-width: 1px;
+  align-self: stretch;
+  display: flex;
+  padding: 34px 51px;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.author-logo {
+  aspect-ratio: 1.12;
+  object-fit: contain;
+  object-position: center;
+  width: 141px;
+}
+
+.author-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  margin-top: 50px;
+  width: 90%;
+}
+
+.author-nav-item {
+  display: flex;
+  padding: 14px 18px;
+  align-items: center;
+  gap: 14px;
+  font-family: 'Poppins', -apple-system, 'Roboto', sans-serif;
+  font-size: 14px;
+  color: #4b5563;
+  font-weight: 400;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.author-nav-item:hover {
+  background-color: #f3f4f6;
+  color: #2563eb;
+}
+
+.author-nav-item.active {
+  background-color: #eff6ff;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.author-nav-icon {
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+  width: 22px;
+  align-self: stretch;
+  margin-top: auto;
+  margin-bottom: auto;
+  flex-shrink: 0;
+}
+
+.author-nav-text {
+  align-self: stretch;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+@media (max-width: 991px) {
+  .author-sidebar {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .author-sidebar-content {
+    margin-top: 20px;
+    min-height: auto;
+    padding-bottom: 50px;
+    border-radius: 16px;
+    position: relative;
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .author-logo-container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .author-sidebar-nav {
+    margin-top: 30px;
+    width: 90%;
+  }
+
+  .author-nav-item {
+    white-space: initial;
+  }
+}

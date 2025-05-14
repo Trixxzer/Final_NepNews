@@ -1,0 +1,67 @@
+.header {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+  gap: 20px;
+  margin: 0px auto 0;
+  font-family: 'Poppins', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 20px;
+  color: #000;
+  font-weight: 500;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; 
+  background-color: #fff;
+}
+
+.header-menu-icon {
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+  width: 40px;
+  margin: auto 0;
+  cursor: pointer;
+}
+
+.header-logo {
+  aspect-ratio: 1.12;
+  object-fit: contain;
+  object-position: center;
+  width: 95px;
+}
+
+.login-button {
+  border-radius: 20px;
+  background-color: #fff;
+  display: flex;
+  padding: 6px 15px;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  color: #000;
+  margin-top: 37px;
+  align-self: flex-end;
+}
+
+.login-icon {
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+  width: 24px;
+  margin: auto 0;
+}
+
+@media (max-width: 991px) {
+  .header {
+    max-width: 100%;
+  }
+  
+  .login-button {
+    white-space: initial;
+  }
+}

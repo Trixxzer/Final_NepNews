@@ -1,0 +1,71 @@
+.stat-card {
+  width: 100%;
+  min-height: 140px; /* ⬅️ enough height to fit value + change text */
+  box-shadow: 0px 1px 2px rgba(0,0,0,0.05);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #FFF;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+}
+
+.stat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-card-title {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.stat-card-icon-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 2px 4px rgba(0,0,0,0.05);
+}
+
+.stat-card-value {
+  font-family: 'Roboto', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #1F2937;
+  margin-top: 8px;
+}
+
+.stat-card-change {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* ✅ color variants */
+.change-up {
+  color: #16a34a;
+}
+.change-down {
+  color: #dc2626;
+}
+
+/* Responsive tweak */
+@media (max-width: 991px) {
+  .stat-card {
+    min-height: 160px;
+  }
+}

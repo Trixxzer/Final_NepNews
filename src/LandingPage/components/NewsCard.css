@@ -1,0 +1,147 @@
+.news-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: #000;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+}
+
+.news-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.news-card-image-container {
+  width: 100%;
+  overflow: hidden;
+}
+
+.news-card-image {
+  width: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.news-card:hover .news-card-image {
+  transform: scale(1.05);
+}
+
+.news-card-content {
+  padding: 15px;
+  font-family: 'Poppins', -apple-system, Roboto, Helvetica, sans-serif;
+}
+
+.news-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.news-card-summary {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+  color: #333;
+}
+
+.news-card-meta {
+  font-size: 10px;
+  color: #666;
+  margin-top: 15px;
+}
+
+/* Standard Card */
+.news-card-standard {
+  background-color: #f4f6f8;
+}
+
+/* Featured Card */
+.news-card-featured {
+  background-color: #f4f6f8;
+}
+
+.news-card-featured .news-card-title {
+  font-size: 36px;
+  text-align: center;
+}
+
+/* Sidebar Card */
+.news-card-sidebar {
+  background-color: #f4f6f8;
+  margin-bottom: 20px;
+}
+
+.news-card-sidebar .news-card-title {
+  text-align: center;
+}
+
+/* Horizontal Card */
+.news-card-horizontal {
+  flex-direction: row;
+  background-color: #d9d9d9;
+}
+
+.news-card-horizontal .news-card-image-container {
+  width: 56%;
+}
+
+.news-card-horizontal .news-card-content {
+  width: 44%;
+  padding: 13px 20px;
+}
+
+/* Small Card */
+.news-card-small {
+  background-color: #fff;
+  border-radius: 20px;
+  height: 100%;
+}
+
+.news-card-small .news-card-title {
+  font-size: 14px;
+  text-align: center;
+}
+
+.news-card-small .news-card-summary {
+  font-size: 10px;
+  margin-top: 15px;
+}
+
+.political-card-container {
+  border-radius: 20px;
+  overflow: hidden;
+  width: 296px;
+  min-width: 240px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+@media (max-width: 991px) {
+  .news-card-horizontal {
+    flex-direction: column;
+  }
+  
+  .news-card-horizontal .news-card-image-container,
+  .news-card-horizontal .news-card-content {
+    width: 100%;
+  }
+  
+  .news-card-horizontal .news-card-image-container {
+    margin-top: 18px;
+  }
+  
+  .news-card-horizontal .news-card-content {
+    margin-top: 31px;
+  }
+  
+  .news-card-featured .news-card-title {
+    font-size: 24px;
+  }
+  
+  .political-card-container {
+    width: 100%;
+  }
+}

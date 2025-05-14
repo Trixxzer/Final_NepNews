@@ -1,0 +1,155 @@
+.author-drafts-page {
+  padding: 20px 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.author-stats-container {
+  margin-top: 20px;
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 1100px;
+}
+
+.author-editor-container {
+  border-radius: 16px;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-top: 34px;
+  width: 100%;
+  max-width: 1100px;
+  padding-bottom: 30px;
+  font-family: 'Poppins', -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+.author-editor-header {
+  background-color: #f9fafb;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  padding: 24px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.author-editor-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.author-article-form {
+  padding: 30px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.author-form-group {
+  margin-bottom: 24px;
+}
+
+.author-form-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #4b5563;
+  font-size: 15px;
+}
+
+.author-form-group input,
+.author-form-group select,
+.author-form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.author-form-group input:focus,
+.author-form-group select:focus,
+.author-form-group textarea:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background-color: white;
+}
+
+.author-form-group textarea {
+  resize: vertical;
+  min-height: 200px;
+}
+
+.author-form-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 30px;
+  justify-content: center;
+}
+
+.author-save-draft-btn,
+.author-submit-review-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 150px;
+}
+
+.author-save-draft-btn {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.author-save-draft-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.author-submit-review-btn {
+  background-color: #2563eb;
+  color: white;
+}
+
+.author-submit-review-btn:hover {
+  background-color: #1d4ed8;
+}
+
+@media (max-width: 991px) {
+  .author-stats-container {
+    flex-direction: column;
+    max-width: 100%;
+  }
+
+  .author-editor-container {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .author-editor-header {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .author-article-form {
+    padding: 20px;
+  }
+
+  .author-form-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .author-save-draft-btn,
+  .author-submit-review-btn {
+    width: 100%;
+    max-width: 300px;
+  }
+}

@@ -1,0 +1,131 @@
+.articles-table-container {
+  box-shadow: 0px 1px 2px rgba(0,0,0,0.05);
+  border-radius: 12px;
+  padding: 24px;
+  background-color: #FFF;
+  margin-bottom: 80px;
+}
+
+.articles-table-title {
+  font-family: 'Roboto', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1F2937;
+  margin-bottom: 20px;
+}
+
+.articles-table {
+  display: flex;
+  flex-direction: column;
+  min-width: 800px;
+}
+
+.articles-table-header {
+  display: flex;
+  padding: 12px 16px;
+  background-color: #F9FAFB;
+  border-radius: 8px 8px 0 0;
+}
+
+.articles-table-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #E5E7EB;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.articles-table-row:hover {
+  background-color: #F9FAFB;
+}
+
+.articles-table-row:last-child {
+  border-bottom: none;
+  border-radius: 0 0 8px 8px;
+}
+
+.articles-table-cell {
+  flex: 1;
+  text-align: left;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1F2937;
+  padding: 0 8px;
+}
+
+.articles-table-header .articles-table-cell {
+  color: #6B7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.category-cell {
+  display: table-cell;
+}
+
+.status-published {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #047857;
+  background-color: #D1FAE5;
+}
+
+.status-pending {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #B45309;
+  background-color: #FEF3C7;
+}
+
+.action-cell {
+  cursor: pointer;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.action-button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.action-button.review {
+  background-color: #EFF6FF;
+  color: #2563EB;
+}
+
+.action-button.review:hover {
+  background-color: #DBEAFE;
+}
+
+.action-button.view {
+  background-color: #F3F4F6;
+  color: #4B5563;
+}
+
+.action-button.view:hover {
+  background-color: #E5E7EB;
+}
+
+@media (max-width: 991px) {
+  .articles-table-container {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .articles-table-container {
+    padding: 10px;
+  }
+}
