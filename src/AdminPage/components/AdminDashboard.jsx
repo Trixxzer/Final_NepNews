@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import StatCard from './StatCard';
-import './style.css';
 
 const Dashboard = () => {
   const [stats, setStats] = useState([]);
