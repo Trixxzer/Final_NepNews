@@ -305,31 +305,12 @@ class RoleChangeRequestViewSet(viewsets.ModelViewSet):
             })
         return Response(data)
 
-    def post(self, request, *args, **kwargs):
-        # Admin can approve or reject a role change request from the list endpoint
-        req_id = request.data.get('id')
-        action = request.data.get('action')  # 'accept' or 'reject'
-        if not req_id or action not in ['accept', 'reject']:
-            return Response({'error': 'id and action (accept or reject) are required.'}, status=400)
-        try:
-            req = RoleChangeRequest.objects.get(id=req_id)
-        except RoleChangeRequest.DoesNotExist:
-            return Response({'error': 'Role change request not found.'}, status=404)
-        if req.status != 'pending':
-            return Response({'error': 'Request already processed'}, status=400)
-        if action == 'accept':
-            req.status = 'approved'
-            req.decision_date = datetime.now()
-            req.save()
-            user = req.user
-            user.role = req.requested_role
-            user.save()
-            return Response({'status': 'approved'})
-        else:
-            req.status = 'rejected'
-            req.decision_date = datetime.now()
-            req.save()
-            return Response({'status': 'rejected'})
+    def create(self, request, *args, **kwargs):
+        # Prevent duplicate pending requests for the same user
+        user = request.user
+        if RoleChangeRequest.objects.filter(user=user, status='pending').exists():
+            return Response({'error': 'You already have a pending role change request. Please wait for it to be processed before submitting another.'}, status=400)
+        return super().create(request, *args, **kwargs)
 
 @api_view(['GET', 'POST'])
 @permission_classes([AdminPermission])
