@@ -16,7 +16,6 @@ const AdminPanel = () => {
 
   const navigate = useNavigate();
 
-  
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -55,7 +54,8 @@ const AdminPanel = () => {
             <h1>{activePage.charAt(0).toUpperCase() + activePage.slice(1)}</h1>
           </div>
           <div className="editor-header-right">
-            <span className="editor-username" onClick={() => setProfileModalOpen(true)}>
+            {/* Removed onClick here so the name is NOT clickable */}
+            <span className="editor-username">
               {adminProfile.name}
             </span>
             <button
