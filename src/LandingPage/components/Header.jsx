@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import './Header.css';
+import logo from '../../logo.png';
 
 const Header = ({ toggleSideMenu }) => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const Header = ({ toggleSideMenu }) => {
         }}
       >
         <img 
-          src="https://cdn.builder.io/api/v1/image/assets/0cd8f8442cb540f2ac86cc4fd1eefba2/fe8566d938ccd5dfcc6419dc4ed429abb9ba7b9d?placeholderIfAbsent=true" 
+          src={logo} 
           alt="Logo" 
           className="header-logo" 
         />

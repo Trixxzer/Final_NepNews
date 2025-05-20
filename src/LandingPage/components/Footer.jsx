@@ -1,5 +1,6 @@
 import React from 'react';
 import './Footer.css';
+import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 
 const Footer = () => {
   return (
@@ -35,11 +36,19 @@ const Footer = () => {
           Affiliate Partnerships with retailers. The material on this site may not be
         </p>
         <div className="footer-social">
-          <img src="https://cdn.builder.io/api/v1/image/assets/0cd8f8442cb540f2ac86cc4fd1eefba2/ba4d4ef995fe87d2d5bc9e42fe36cf26646feec5?placeholderIfAbsent=true" alt="Social Media" className="footer-social-icon" />
-          <img src="https://cdn.builder.io/api/v1/image/assets/0cd8f8442cb540f2ac86cc4fd1eefba2/aaffa218e12403e101be8bd22f411feb92643734?placeholderIfAbsent=true" alt="Social Media" className="footer-social-icon" />
-          <img src="https://cdn.builder.io/api/v1/image/assets/0cd8f8442cb540f2ac86cc4fd1eefba2/52b177f16eecc1b89a3e503db0d7e2bc0d003e7f?placeholderIfAbsent=true" alt="Social Media" className="footer-social-icon" />
-          <img src="https://cdn.builder.io/api/v1/image/assets/0cd8f8442cb540f2ac86cc4fd1eefba2/ac5d5a53d69787ac082f69c468e8f937f0e927c9?placeholderIfAbsent=true" alt="Social Media" className="footer-social-icon" />
-        </div>
+  <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="footer-social-icon">
+    <FaFacebookF />
+  </a>
+  <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="footer-social-icon">
+    <FaTwitter />
+  </a>
+  <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="footer-social-icon">
+    <FaInstagram />
+  </a>
+  <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="footer-social-icon">
+    <FaLinkedinIn />
+  </a>
+</div>
       </div>
       <div className="footer-divider"></div>
     </footer>
