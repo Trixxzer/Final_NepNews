@@ -10,7 +10,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth import get_user_model
 from .serializers import UserSerializer, LoginSerializer, PasswordResetRequestSerializer, PasswordResetConfirmSerializer, AuthorProfileSerializer, EditorProfileSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
 from .models import AuthorProfile, EditorProfile, CustomUser
@@ -464,3 +464,27 @@ class AuthorDashboardView(APIView):
             'pending_reviews': pending_reviews,
             'recent_articles': recent_data
         })
+
+# New public view for published articles
+class PublishedArticlesListView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request):
+        # Get all published articles (status='approved')
+        articles = Article.objects.filter(status='approved').order_by('-created_at')
+        
+        # Serialize the articles with necessary fields
+        data = []
+        for article in articles:
+            article_data = {
+                'id': article.id,
+                'title': article.title,
+                'content': article.content, # Changed from description to content
+                'category': article.category.name,
+                'author': article.author.username,
+                'created_at': article.created_at.strftime("%b %d, %Y"),
+                'image': request.build_absolute_uri(article.image.url) if article.image else None,
+                'views': article.views,
+                'comments': article.comments_count,
+            }
+            data.append(article_data)
+        return Response(data)
